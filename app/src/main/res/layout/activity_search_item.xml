@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/search_item_view"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="@dimen/activity_vertical_margin"
+              android:background="@color/colorWhite"
+     >
+        <LinearLayout android:showDividers="end"  android:divider="@color/colorGray"
+                      android:id="@+id/item_layout"
+                      android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"           android:orientation="horizontal"
+            android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="63dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/nocover"
+                    android:id="@+id/novel_img">
+                </ImageView>
+                        <TableLayout   android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                                       android:stretchColumns="1"
+                            >
+                                <TableRow >
+                                        <TextView
+                                            android:layout_span="2"
+                                            android:id="@+id/novle_title"
+                                            android:textSize="@dimen/novel_title_size"
+                                            android:textColor="@color/colorPrimary"
+                                            android:text="小说标题"/>
+                                </TableRow>
+                                <TableRow android:orientation="horizontal">
+
+                                        <TextView     android:layout_span="2"
+                                                  android:id="@+id/novel_description"
+                                                  android:layout_width="wrap_content"
+                                                  android:layout_height="28dp"
+                                                      android:textSize="@dimen/novel_search_size" />
+                                </TableRow>
+                                <TableRow      >
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_column="0"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:text="作者:   "/>
+                                        <TextView
+                                            android:id="@+id/novel_author"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_column="1"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:text=""/>
+                                </TableRow>
+                                <TableRow      >
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_column="0"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:text="类型:   "/>
+                                        <TextView
+                                            android:id="@+id/novel_type"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:layout_column="1"
+                                            />
+                                </TableRow>
+                                <TableRow      >
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_column="0"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:text="更新时间:   "/>
+                                        <TextView
+                                            android:id="@+id/novel_last_edit_date"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:layout_column="1"
+                                            />
+                                </TableRow>
+                                <TableRow      >
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_column="0"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:text="更新状态:   "/>
+                                        <TextView
+                                            android:id="@+id/novel_status"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:textSize="@dimen/novel_search_size"
+                                            android:layout_column="1"
+                                            android:text=""/>
+                                </TableRow>
+                        </TableLayout>
+
+
+         </LinearLayout>
+        <ImageView  android:layout_below="@id/item_layout"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray"
+            />
+</RelativeLayout>
