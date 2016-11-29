@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content" android:layout_marginTop="@dimen/activity_vertical_margin"
+              android:background="@color/colorWhite"
+     >
+        <LinearLayout android:showDividers="end"  android:divider="@color/colorGray"
+                      android:id="@+id/item_layout"
+                      android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"           android:orientation="horizontal"
+            android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="100dp"
+                    android:src="@android:drawable/ic_dialog_email"
+                    android:id="@+id/img">
+                </ImageView>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:orientation="vertical"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin">
+                        <TextView
+                            android:layout_width="wrap_content"
+
+                            android:textSize="@dimen/novel_title_size"
+                            android:layout_height="wrap_content"  android:text="小说标题"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                             android:layout_marginTop="@dimen/novel_line_space"
+                            android:layout_height="wrap_content"  android:text="发顺丰爱的发顺丰爱的发顺丰爱的发顺丰 阿斯蒂芬 "/>
+
+                </LinearLayout>
+         </LinearLayout>
+        <ImageView  android:layout_below="@id/item_layout"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorGray"
+            />
+</RelativeLayout>
