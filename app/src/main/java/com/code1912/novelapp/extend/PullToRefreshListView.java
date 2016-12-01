@@ -54,7 +54,7 @@ public class PullToRefreshListView extends ListView implements AbsListView.OnScr
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         //当滑动到底端，并滑动状态为 not scrolling
-        if(lastVisibleItem<=1){
+        if(totalItemCount<=1){
             return;
         }
         if(lastVisibleItem == totalItemCount && scrollState == SCROLL_STATE_IDLE){

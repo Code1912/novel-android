@@ -142,6 +142,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         if (query == "") {
             return true;
         }
+        this.queryText=query;
         this.adapter.removeAllNovels();
         this.search(query);
         return false;
