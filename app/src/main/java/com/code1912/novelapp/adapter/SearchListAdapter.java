@@ -21,8 +21,7 @@ public class SearchListAdapter extends BaseAdapter  {
     List<Novel> novelList =new ArrayList<Novel>();
     Context context;
     LayoutInflater layoutInflater;
-    public  SearchListAdapter(Context context, List<Novel> novelList){
-        this.novelList = novelList;
+    public  SearchListAdapter(Context context){
         this.context = context;
         this.layoutInflater=LayoutInflater.from(context);
     }
@@ -39,6 +38,22 @@ public class SearchListAdapter extends BaseAdapter  {
     @Override
     public long getItemId(int i) {
         return i;
+    }
+
+    public void addNovels(List<Novel> novels){
+        if(novels==null||novels.size()==0){
+            return;
+        }
+        this.novelList.addAll(novels);
+        this.notifyDataSetChanged();
+    }
+
+    public  void removeAllNovels(){
+        if(novelList==null||novelList.size()==0){
+            return;
+        }
+        this.novelList.clear();
+        this.notifyDataSetChanged();
     }
 
     @Override

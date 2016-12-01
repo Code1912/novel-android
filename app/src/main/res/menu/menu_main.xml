@@ -3,8 +3,9 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.code1912.novelapp.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/main_search"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_menu_search"
+        android:title="main"
+        app:showAsAction="always"/>
 </menu>

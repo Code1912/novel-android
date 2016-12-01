@@ -10,6 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
         >
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -20,10 +21,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ListView android:id="@+id/search_list"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:drawSelectorOnTop="false"
-              app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
+
+          <com.code1912.novelapp.extend.PullToRefreshListView
+               app:layout_behavior="@string/appbar_scrolling_view_behavior"
+              android:layout_width="match_parent" android:id="@+id/search_list"
+              android:layout_height="wrap_content">
+
+          </com.code1912.novelapp.extend.PullToRefreshListView>
+
+
 </android.support.design.widget.CoordinatorLayout>
