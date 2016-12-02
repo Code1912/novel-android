@@ -1,133 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-               android:orientation="vertical"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:background="@color/colorWhite">
-
-    <ScrollView
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 xmlns:tools="http://schemas.android.com/tools"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:fitsSystemWindows="true"
+                                                 tools:context="com.code1912.novelapp.NovelActivity"
+    >
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="match_parent" android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
+    <ScrollView     app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" android:id="@+id/novel_scrollView"
         android:scrollbars="none" android:layout_weight="1.0"
         >
         <LinearLayout  android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-    <LinearLayout android:showDividers="end"  android:divider="@color/colorGray"
-                  android:id="@+id/item_layout"
-                  android:layout_margin="@dimen/activity_horizontal_margin"
-                  android:layout_width="match_parent"           android:orientation="horizontal"
-                  android:layout_height="wrap_content">
-        <ImageView
-            android:layout_width="65dp"
-            android:layout_height="90dp"
-            android:src="@drawable/nocover"
-            android:id="@+id/novel_img">
-        </ImageView>
-        <TableLayout   android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                       android:layout_width="wrap_content"
-                       android:layout_height="wrap_content"
+                  <LinearLayout android:showDividers="end"  android:divider="@color/colorGray"
+                              android:id="@+id/item_layout"
+                              android:layout_margin="@dimen/activity_horizontal_margin"
+                              android:layout_width="match_parent"           android:orientation="horizontal"
+                              android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="87dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/nocover"
+                        android:id="@+id/novel_img">
+                    </ImageView>
+                    <TableLayout   android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                                   android:layout_width="wrap_content"
+                                   android:layout_height="wrap_content"
 
-                       android:stretchColumns="1"
-            >
-            <TableRow >
-                <TextView
-                    android:layout_span="2"
-                    android:id="@+id/novle_title"
-                    android:textSize="@dimen/novel_title_size"
-                    android:textColor="@color/colorPrimary"
-                    android:text="小说标题"/>
-            </TableRow>
+                                   android:stretchColumns="1"
+                        >
+                        <TableRow >
+                            <TextView
+                                android:layout_span="2"
+                                android:id="@+id/novle_title"
+                                android:textSize="@dimen/novel_title_size"
+                                android:textColor="@color/colorPrimary"
+                                android:text="小说标题"/>
+                        </TableRow>
 
-            <TableRow      >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text="作者:   "/>
-                <TextView
-                    android:id="@+id/novel_author"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="1"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text=""/>
-            </TableRow>
-            <TableRow      >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text="类型:   "/>
-                <TextView
-                    android:id="@+id/novel_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/novel_search_size"
-                    android:layout_column="1"
-                    />
-            </TableRow>
-            <TableRow      >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text="更新:   "/>
-                <TextView
-                    android:id="@+id/novel_last_edit_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/novel_search_size"
-                    android:layout_column="1"
-                    />
-            </TableRow>
-            <TableRow      >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text="状态:   "/>
-                <TextView
-                    android:id="@+id/novel_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/novel_search_size"
-                    android:layout_column="1"
-                    android:text=""/>
-            </TableRow>
-            <TableRow      >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="0"
-                    android:textSize="@dimen/novel_search_size"
-                    android:text="最新:   "/>
-                <TextView
-                    android:id="@+id/novel_new_chapter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/novel_search_size"
-                    android:layout_column="1"
-                    android:text=""/>
-            </TableRow>
-        </TableLayout>
+                        <TableRow      >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text="作者:   "/>
+                            <TextView
+                                android:id="@+id/novel_author"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="1"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text=""/>
+                        </TableRow>
+                        <TableRow      >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text="类型:   "/>
+                            <TextView
+                                android:id="@+id/novel_type"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/novel_search_size"
+                                android:layout_column="1"
+                                />
+                        </TableRow>
+                        <TableRow      >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text="更新:   "/>
+                            <TextView
+                                android:id="@+id/novel_last_edit_date"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/novel_search_size"
+                                android:layout_column="1"
+                                />
+                        </TableRow>
+                        <TableRow      >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text="状态:   "/>
+                            <TextView
+                                android:id="@+id/novel_status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/novel_search_size"
+                                android:layout_column="1"
+                                android:text=""/>
+                        </TableRow>
+                        <TableRow      >
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:textSize="@dimen/novel_search_size"
+                                android:text="最新:   "/>
+                            <TextView
+                                android:id="@+id/novel_new_chapter"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="@dimen/novel_search_size"
+                                android:layout_column="1"
+                                android:text=""/>
+                        </TableRow>
+                    </TableLayout>
 
 
-         </LinearLayout>
-                 <TextView  android:minHeight="40dp" android:layout_margin="@dimen/activity_horizontal_margin"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"/>
-         <ListView
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_margin="@dimen/activity_horizontal_margin"
-             ></ListView>
+                     </LinearLayout>
+                  <TextView  android:minHeight="40dp"  android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                             android:layout_marginRight="@dimen/activity_horizontal_margin"
+                                        android:id="@+id/novel_description"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="wrap_content"/>
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="match_parent"  android:paddingLeft="@dimen/activity_horizontal_margin" android:paddingRight="@dimen/activity_horizontal_margin"
+                android:layout_height="@dimen/btn_height"   android:background="@color/colorPrimary"  android:gravity="center_vertical" >
+                <TextView
+                    android:layout_width="wrap_content"  android:text="最新章节  更新    " android:textColor="@color/colorWhite"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="wrap_content" android:textColor="@color/colorWhite"
+                    android:layout_height="wrap_content" android:id="@+id/novel_last_edit_date1"/>
+            </LinearLayout>
+                     <ListView
+                         android:id="@+id/novel_chapter_listView"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:divider="#00000000"
+                         android:dividerHeight="0dip"
+                         android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                         ></ListView>
         </LinearLayout>
     </ScrollView>
 
@@ -146,4 +178,5 @@
 
     </TableLayout>
 
-</LinearLayout>
+    </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

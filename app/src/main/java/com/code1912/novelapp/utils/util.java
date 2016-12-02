@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by Code1912 on 2016/11/29.
  */
 
-public class util {
+public class Util {
     public static String getStrTime(long cc_time,String format) {
         String re_StrTime = null;
         SimpleDateFormat sdf = new SimpleDateFormat(format);

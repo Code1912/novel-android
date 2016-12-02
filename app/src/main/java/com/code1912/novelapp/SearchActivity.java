@@ -3,15 +3,12 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
@@ -19,6 +16,7 @@ import com.code1912.novelapp.adapter.SearchListAdapter;
 import com.code1912.novelapp.extend.PullToRefreshListView;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
+import com.code1912.novelapp.utils.Config;
 
 import java.io.IOException;
 import okhttp3.Call;
@@ -37,6 +35,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
     PullToRefreshListView pullToRefreshListView;
     SearchListAdapter adapter;
     String queryText;
+
     @Override
     protected void onCreate(Bundle intent) {
         super.onCreate(intent);
@@ -46,16 +45,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         setSupportActionBar(toolbar);
         //display white color back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                    SearchActivity.this.finish();
-            }
-        });
-      //  swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.search_swipeRefreshLayout);
-     //   swipeRefreshLayout.setOnRefreshListener(()->{
-
-      //  });
+        toolbar.setNavigationOnClickListener(v -> SearchActivity.this.finish());
 
         pullToRefreshListView =(PullToRefreshListView)findViewById(R.id.search_list);
         adapter=new SearchListAdapter(SearchActivity.this);
@@ -63,8 +53,19 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         pullToRefreshListView.setOnLoadListener(()->{
             search(queryText);
         });
-        getIntent().getStringExtra(SearchManager.QUERY);
-        search(getIntent().getStringExtra(SearchManager.QUERY));
+        pullToRefreshListView.setOnItemClickListener((adapterView, view, i, l) -> {
+            Novel item=  (Novel) adapter.getItem(i) ;
+            Intent newIntent = new Intent(SearchActivity.this,NovelActivity.class);
+            Bundle bundle=new Bundle();
+            String str=JSON.toJSONString(item);
+            bundle.putString(Config.TRANSPORT_KEY,str);
+            newIntent.putExtras(bundle);
+           // newIntent.putExtra("atd",JSON.toJSONString(item));
+
+            startActivity(newIntent);
+
+
+        });
     }
 
     @Override
@@ -89,11 +90,10 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         //searchView.setSubmitButtonEnabled(true);
 
        searchView.onActionViewExpanded();
-
         searchView.setQueryHint("小说go");
        // searchView.setIconifiedByDefault(false);
         //toolbar.setNavigationIcon(R.drawable.ic_ab_back_holo_dark_am);
-       // toolbar.setNavigationOnClickListener(( view)->  SearchActivity.this.finish());
+
         return true;
     }
 
@@ -107,7 +107,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
     private  void search(String keyword){
         int pageIndex=result==null?-1:result.pageIndex+1;
         Request request = new Request.Builder()
-                .url(String.format("http://www.code1912.cn:3000/search?keyword=%s&pageIndex=%d&type=1",keyword,pageIndex))
+                .url(Config.getSearchUrl(keyword,pageIndex))
                 .build();
         Call   call = mOkHttpClient.newCall(request);
         call.enqueue(new Callback()

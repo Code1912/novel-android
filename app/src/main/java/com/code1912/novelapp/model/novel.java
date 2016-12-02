@@ -1,13 +1,16 @@
 package com.code1912.novelapp.model;
 
+import com.code1912.novelapp.utils.Util;
 import com.orm.SugarRecord;
 import com.orm.dsl.Unique;
+
+import java.io.Serializable;
 
 /**
  * Created by Code1912 on 2016/11/29.
  */
 
-public class Novel extends SugarRecord {
+public class Novel extends SugarRecord implements Serializable {
     @Unique
     public  String id;
     public  String author_name;
@@ -25,7 +28,9 @@ public class Novel extends SugarRecord {
     public  String updateStatus;
     public  String  url;
     public  long  wordCount;
-
+     public  String getLastEditDate(){
+       return    Util.getStrTime(this.dateModified,"yyyy-MM-dd HH:MM:ss");
+     }
     public Novel(){
 
     }

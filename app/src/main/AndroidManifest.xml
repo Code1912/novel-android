@@ -20,19 +20,21 @@
             </intent-filter>
         </activity>
         <activity
-               android:launchMode="singleTop"
+
                android:name=".SearchActivity"
                android:theme="@style/AppTheme.NoActionBar"
-               android:label=""
+               android:label="search"
               >
                 <meta-data
                     android:name="android.app.searchable"
                     android:resource="@xml/searchable"    />
-                <intent-filter>
-                    <action android:name="android.intent.action.SEARCH" />
-                </intent-filter>
-        </activity>
 
+        </activity>
+          <activity android:name=".NovelActivity"
+                    android:label="novel"
+                    android:theme="@style/AppTheme.NoActionBar">
+
+          </activity>
         <meta-data android:name="DATABASE" android:value="novel_go.db" />
         <meta-data android:name="VERSION" android:value="3" />
         <meta-data android:name="QUERY_LOG" android:value="true" />

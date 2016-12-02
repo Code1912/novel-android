@@ -58,7 +58,7 @@ public class SearchListAdapter extends BaseAdapter  {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        System.out.println("getView " + position + " " + convertView);
+      //  System.out.println("getView " + position + " " + convertView);
         SearchItemViewHolder holder = null;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.activity_search_item, null);
