@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 
 import com.code1912.novelapp.R;
 import com.code1912.novelapp.model.ChapterTitle;
-import com.code1912.novelapp.search.ChapterTitleHolder;
+import com.code1912.novelapp.viewholder.ChapterTitleHolder;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,11 +1,12 @@
 package com.code1912.novelapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -22,7 +23,6 @@ import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
 
 import org.apache.calcite.linq4j.Linq4j;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
@@ -54,12 +54,27 @@ public class NovelActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> NovelActivity.this.finish());
+
         listViewAdapter = new ChapterListAdapter(this);
         listView = (ListView) findViewById(R.id.novel_chapter_listView);
         listView.setAdapter(listViewAdapter);
+
         setNovel();
         getChapterList();
 
+        findViewById(R.id.btn_add).setOnClickListener(view -> {
+            if(Config.getNovelListLinq().any(n->n.name.equals(novel.name)&&n.author_name.equals(novel.author_name))){
+                return;
+            }
+            Intent intent = new Intent();
+            intent.putExtra(Config.KEY,Config.ADD_NOVEL_KEY);
+            intent.setAction(Config.BROADCAST_ADD_NOVEL);
+            Bundle bundle = new Bundle();
+            String str = JSON.toJSONString(novel);
+            bundle.putString(Config.TRANSPORT_KEY, str);
+            intent.putExtras(bundle);
+            sendBroadcast(intent);
+        });
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView) {
@@ -86,7 +101,7 @@ public class NovelActivity extends AppCompatActivity {
         if (novel == null) {
             return;
         }
-        SetText(R.id.novle_title, novel.name);
+        SetText(R.id.novel_title, novel.name);
         SetText(R.id.novel_author, novel.author_name);
         SetText(R.id.novel_type, novel.genre);
         SetText(R.id.novel_status, novel.updateStatus);

@@ -52,7 +52,7 @@
                         <TableRow >
                             <TextView
                                 android:layout_span="2"
-                                android:id="@+id/novle_title"
+                                android:id="@+id/novel_title"
                                 android:textSize="@dimen/novel_title_size"
                                 android:textColor="@color/colorPrimary"
                                 android:text="小说标题"/>
@@ -168,10 +168,10 @@
         android:layout_height="wrap_content"
         android:stretchColumns="1,2" >
         <TableRow>
-            <Button   android:layout_column="1"
+            <Button   android:layout_column="1" android:id="@+id/btn_start_read"
                  android:text="开始阅读" android:background="@color/colorPrimary"  android:textColor="@color/colorWhite"
                 android:layout_height="@dimen/btn_height"/>
-            <Button
+            <Button android:id="@+id/btn_add"
                android:text="加入书架" android:background="@drawable/btn_join_style"  android:textColor="@color/colorPrimary"
                 android:layout_height="@dimen/btn_height"/>
         </TableRow>

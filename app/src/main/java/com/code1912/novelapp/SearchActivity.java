@@ -12,10 +12,12 @@ import android.view.MenuItem;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.code1912.novelapp.adapter.SearchListAdapter;
+import com.code1912.novelapp.adapter.ListAdapter;
 import com.code1912.novelapp.extend.PullToRefreshListView;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
+import com.code1912.novelapp.utils.Util;
+import com.code1912.novelapp.viewholder.SearchItemViewHolder;
 import com.code1912.novelapp.utils.Config;
 
 import java.io.IOException;
@@ -33,7 +35,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
     OkHttpClient mOkHttpClient = new OkHttpClient();
     CommonResponse<Novel> result;
     PullToRefreshListView pullToRefreshListView;
-    SearchListAdapter adapter;
+    ListAdapter<Novel> adapter;
     String queryText;
 
     @Override
@@ -48,7 +50,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         toolbar.setNavigationOnClickListener(v -> SearchActivity.this.finish());
 
         pullToRefreshListView =(PullToRefreshListView)findViewById(R.id.search_list);
-        adapter=new SearchListAdapter(SearchActivity.this);
+        adapter=new ListAdapter(SearchActivity.this, SearchItemViewHolder.class,R.layout.activity_search_item);
         pullToRefreshListView.setAdapter(adapter);
         pullToRefreshListView.setOnLoadListener(()->{
             search(queryText);
@@ -118,7 +120,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
                 Log.v("------------", str);
                 result = JSON.parseObject(str, new TypeReference<CommonResponse<Novel>>(){});
                 runOnUiThread(()->{
-                    SearchActivity.this.adapter.addNovels(result.resultList);
+                    SearchActivity.this.adapter.addDataList(result.resultList);
                 });
                 SearchActivity.this.setRefreshing(false);
             }
@@ -139,9 +141,10 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if (query == "") {
+        if (Util.IsNullOrEmpty(query)) {
             return true;
         }
+        this.result=null;
         this.queryText=query;
         this.adapter.removeAllNovels();
         this.search(query);

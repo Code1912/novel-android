@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical" android:paddingTop="@dimen/activity_vertical_margin"
+              android:layout_width="match_parent" android:paddingLeft="10dp" android:paddingRight="10dp"
+              android:layout_height="150dp">
+    <ImageView
+        android:layout_width="87dp"
+        android:layout_height="120dp"
+        android:src="@drawable/nocover" android:layout_gravity="center_horizontal"
+        android:id="@+id/novel_img">
+    </ImageView>
+    <TextView
+        android:id="@+id/novel_title"
+        android:layout_width="87dp" android:gravity="center_horizontal"
+        android:layout_height="25dp" android:layout_gravity="center_horizontal"
+        android:minLines="1" android:maxLines="1"
+        android:ellipsize="end"
+        android:text="小说标题"/>
+</LinearLayout>

@@ -1,7 +1,6 @@
-package com.code1912.novelapp.search;
+package com.code1912.novelapp.viewholder;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -9,20 +8,19 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.code1912.novelapp.R;
 import com.code1912.novelapp.model.Novel;
-import com.code1912.novelapp.utils.Util;
 
 /**
  * Created by Code1912 on 2016/11/29.
  */
 
-public   class SearchItemViewHolder extends RecyclerView.ViewHolder {
+public   class SearchItemViewHolder extends ViewHolderBase<Novel> {
     public SearchItemViewHolder(View itemView) {
         super(itemView);
-        IinitView(itemView);
+        initView(itemView);
     }
-    private   void IinitView(View view){
+    private   void initView(View view){
         this.image=(ImageView)view.findViewById(R.id.novel_img);
-        this.txtTitle=(TextView)view.findViewById(R.id.novle_title);
+        this.txtTitle=(TextView)view.findViewById(R.id.novel_title);
         this.txtDescription=(TextView)view.findViewById(R.id.novel_description);
         this.txtAuthor=(TextView)view.findViewById(R.id.novel_author);
         this.txtStatus=(TextView)view.findViewById(R.id.novel_status);
@@ -37,7 +35,7 @@ public   class SearchItemViewHolder extends RecyclerView.ViewHolder {
     public  TextView txtStatus;
     public  TextView txtType;
     public  TextView txtLastEditDate;
-    public  void setNovelInfo(Context context, Novel novel){
+    public  void setViewInfo(Context context, Novel novel){
         Glide.with(context).load(novel.image).into(this.image);
         this.txtTitle.setText(novel.name);
         this.txtDescription.setText(novel.description);

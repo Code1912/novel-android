@@ -27,7 +27,7 @@
                                 <TableRow >
                                         <TextView
                                             android:layout_span="2"
-                                            android:id="@+id/novle_title"
+                                            android:id="@+id/novel_title"
                                             android:textSize="@dimen/novel_title_size"
                                             android:textColor="@color/colorPrimary"
                                             android:text="小说标题"/>

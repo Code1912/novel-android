@@ -1,11 +1,10 @@
-package com.code1912.novelapp.search;
+package com.code1912.novelapp.viewholder;
 
 /**
  * Created by Code1912 on 2016/12/3.
  */
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.code1912.novelapp.R;
