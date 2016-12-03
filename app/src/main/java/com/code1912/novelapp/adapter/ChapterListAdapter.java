@@ -21,6 +21,7 @@ public class ChapterListAdapter extends BaseAdapter {
     List<ChapterTitle> chapterTitles =new ArrayList<ChapterTitle>();
     Context context;
     LayoutInflater layoutInflater;
+
     public  ChapterListAdapter(Context context){
         this.context = context;
         this.layoutInflater=LayoutInflater.from(context);
@@ -40,7 +41,7 @@ public class ChapterListAdapter extends BaseAdapter {
         return i;
     }
 
-    public void addNovels(List<ChapterTitle> dataList){
+    public void addDataList(List<ChapterTitle> dataList){
         if(dataList==null||dataList.size()==0){
             return;
         }
@@ -48,6 +49,9 @@ public class ChapterListAdapter extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    public List<ChapterTitle> getDataList(){
+        return  new ArrayList<ChapterTitle>(this.chapterTitles);
+    }
     public  void removeAllNovels(){
         if(chapterTitles ==null|| chapterTitles.size()==0){
             return;

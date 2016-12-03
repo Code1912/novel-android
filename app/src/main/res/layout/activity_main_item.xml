@@ -1,19 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical" android:paddingTop="@dimen/activity_vertical_margin"
-              android:layout_width="match_parent" android:paddingLeft="10dp" android:paddingRight="10dp"
-              android:layout_height="150dp">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" android:paddingBottom="5dp" >
+
+
+        <LinearLayout android:layout_marginTop="5dp"
+                      android:orientation="vertical"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                         >
+            <ImageView
+                android:layout_width="87dp"
+                android:layout_height="120dp"
+                android:src="@drawable/nocover" android:layout_gravity="center_horizontal"
+                android:id="@+id/novel_img">
+            </ImageView>
+            <TextView
+                android:id="@+id/novel_title"
+                android:layout_width="87dp" android:gravity="center_horizontal"
+                android:layout_height="25dp" android:layout_gravity="center_horizontal"
+                android:minLines="1" android:maxLines="1"
+                android:ellipsize="end"
+                android:text="小说标题"/>
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="match_parent" android:gravity="center_horizontal"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content" android:id="@+id/novel_read_count" android:text="0"
+                    android:textSize="@dimen/chapter_count_size" android:textColor="@color/colorPrimary"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="wrap_content"  android:text="/"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/novel_all_chapter_count"
+                    android:text="10"
+                    android:textSize="@dimen/chapter_count_size"
+                     />
+            </LinearLayout>
+
+        </LinearLayout>
     <ImageView
-        android:layout_width="87dp"
-        android:layout_height="120dp"
-        android:src="@drawable/nocover" android:layout_gravity="center_horizontal"
-        android:id="@+id/novel_img">
-    </ImageView>
-    <TextView
-        android:id="@+id/novel_title"
-        android:layout_width="87dp" android:gravity="center_horizontal"
-        android:layout_height="25dp" android:layout_gravity="center_horizontal"
-        android:minLines="1" android:maxLines="1"
-        android:ellipsize="end"
-        android:text="小说标题"/>
-</LinearLayout>
+        android:layout_width="wrap_content"  android:id="@+id/icon_has_new" android:src="@drawable/ic_has_new"
+        android:layout_height="wrap_content"  android:layout_gravity="top|right"/>
+</FrameLayout>

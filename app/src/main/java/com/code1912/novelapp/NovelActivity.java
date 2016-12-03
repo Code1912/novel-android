@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -25,6 +24,7 @@ import com.code1912.novelapp.utils.Config;
 import org.apache.calcite.linq4j.Linq4j;
 
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -43,7 +43,7 @@ public class NovelActivity extends AppCompatActivity {
     OkHttpClient mOkHttpClient = new OkHttpClient();
     CommonResponse<ChapterTitle> result;
     ScrollView scrollView;
-
+    List<ChapterTitle> allChapterTitleList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +71,11 @@ public class NovelActivity extends AppCompatActivity {
             intent.setAction(Config.BROADCAST_ADD_NOVEL);
             Bundle bundle = new Bundle();
             String str = JSON.toJSONString(novel);
-            bundle.putString(Config.TRANSPORT_KEY, str);
+            bundle.putString(Config.NOVEL_INFO, str);
+
+            String chapterListStr = JSON.toJSONString(allChapterTitleList);
+            bundle.putString(Config.CHAPTER_LIST, chapterListStr);
+
             intent.putExtras(bundle);
             sendBroadcast(intent);
         });
@@ -130,8 +134,12 @@ public class NovelActivity extends AppCompatActivity {
                 final String str = response.body().string();
                 result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterTitle>>() {
                 });
+                if(result.resultList==null){
+                    return;
+                }
+                allChapterTitleList=result.resultList;
                 runOnUiThread(() -> {
-                    NovelActivity.this.listViewAdapter.addNovels(Linq4j.asEnumerable(result.resultList).reverse().take(15).toList());
+                    NovelActivity.this.listViewAdapter.addDataList(Linq4j.asEnumerable(result.resultList).reverse().take(15).toList());
                     setListViewHeightBasedOnChildren(listView);
                     scrollView.fullScroll(ScrollView.FOCUS_UP);
                 });

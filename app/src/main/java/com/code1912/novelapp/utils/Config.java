@@ -17,6 +17,8 @@ import java.util.Random;
 public class Config {
 	public static String ApiHost = "http://www.code1912.cn:3000";
 	public static final String TRANSPORT_KEY = "TRANSPORT_KEY";
+	public static final String NOVEL_INFO = "NOVEL_INFO";
+	public static final String CHAPTER_LIST = "CHAPTER_LIST";
 	public static final String ADD_NOVEL_KEY = "ADD_NOVEL_KEY";
 	public static final String KEY = "KEY";
 	public static final String BROADCAST_ADD_NOVEL = "BROADCAST_ADD_NOVEL";
@@ -47,7 +49,7 @@ public class Config {
 			new Random().nextInt(20000));
 	}
 	static {
-		List<Novel> list = Novel.listAll(Novel.class,"add_date desc");
+		List<Novel> list = Novel.listAll(Novel.class,"adddate desc");
 		if (list != null&&list.size()>0) {
 			BookList.addAll(list);
 		}

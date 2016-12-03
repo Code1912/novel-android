@@ -9,6 +9,9 @@ import android.widget.BaseAdapter;
 import com.code1912.novelapp.R;
 import com.code1912.novelapp.viewholder.ViewHolderBase;
 
+import org.apache.calcite.linq4j.Enumerable;
+import org.apache.calcite.linq4j.Linq4j;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -53,6 +56,9 @@ public class ListAdapter<T> extends BaseAdapter {
         }
         this.dataList.addAll(novels);
         this.notifyDataSetChanged();
+    }
+    public Enumerable<T> getDataList(){
+        return Linq4j.asEnumerable(this.dataList);
     }
     public void addData(T data) {
         this.dataList.add(data);
