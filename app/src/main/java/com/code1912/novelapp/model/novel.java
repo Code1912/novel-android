@@ -28,10 +28,10 @@ public class Novel extends SugarRecord implements Serializable {
     public  String updateStatus;
     public  String  url;
     public  long  wordCount;
-    public  int read_chapter_count;
+    public  long read_chapter_count;
     public int all_chapter_count;
     public boolean is_have_new;
-
+    public long last_read_chapter_id;
     public  boolean refreshed;
     public Date add_date;
      public  String getLastEditDate(){

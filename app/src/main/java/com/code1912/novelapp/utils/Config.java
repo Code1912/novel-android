@@ -1,5 +1,7 @@
 package com.code1912.novelapp.utils;
 
+import android.util.Log;
+
 import com.code1912.novelapp.model.Novel;
 import com.orm.SugarRecord;
 
@@ -20,8 +22,10 @@ public class Config {
 	public static final String NOVEL_INFO = "NOVEL_INFO";
 	public static final String CHAPTER_LIST = "CHAPTER_LIST";
 	public static final String ADD_NOVEL_KEY = "ADD_NOVEL_KEY";
+	public static final String NOTIFY_NOVEL_KEY = "ADD_NOVEL_KEY";
 	public static final String KEY = "KEY";
 	public static final String BROADCAST_ADD_NOVEL = "BROADCAST_ADD_NOVEL";
+	public static final String BROADCAST_NOTIFY_NOVEL = "BROADCAST_NOTIFY_NOVEL";
 	public final static List<Novel> BookList=new ArrayList<>();
 
 	public static Enumerable<Novel> getNovelListLinq(){
@@ -43,10 +47,12 @@ public class Config {
 	}
 
 	public static String getChapterInfoUrl(String url) {
-		return String.format("%s/chapterInfo?url=%s&type=1&r=%d",
+		String tempUrl= String.format("%s/chapterInfo?url=%s&type=1&r=%d",
 			Config.ApiHost,
 			url,
 			new Random().nextInt(20000));
+		Log.i("URL-------------------",tempUrl);
+		return  tempUrl;
 	}
 	static {
 		List<Novel> list = Novel.listAll(Novel.class,"adddate desc");

@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.code1912.novelapp.R;
+import com.code1912.novelapp.extend.SuperBitmapImageViewTarget;
 import com.code1912.novelapp.model.Novel;
 
 /**
@@ -36,12 +37,11 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 		Glide.with(context)
 			.load(info.image)
 			.centerCrop()
-			.dontAnimate()
+			.crossFade()
 			.placeholder(R.mipmap.ic_launcher).into(this.image);
 		this.txtTitle.setText(info.name);
 		this.txtRead.setText(String.valueOf(info.read_chapter_count));
 		this.txtAll.setText(String.valueOf(info.all_chapter_count));
 		this.ishasNewImg.setVisibility(info.is_have_new ? View.VISIBLE : View.INVISIBLE);
-
 	}
 }

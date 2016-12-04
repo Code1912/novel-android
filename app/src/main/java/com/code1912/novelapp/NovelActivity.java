@@ -16,7 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.bumptech.glide.Glide;
 import com.code1912.novelapp.adapter.ChapterListAdapter;
-import com.code1912.novelapp.model.ChapterTitle;
+import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
@@ -41,9 +41,9 @@ public class NovelActivity extends AppCompatActivity {
     ListView listView;
     ChapterListAdapter listViewAdapter;
     OkHttpClient mOkHttpClient = new OkHttpClient();
-    CommonResponse<ChapterTitle> result;
+    CommonResponse<ChapterInfo> result;
     ScrollView scrollView;
-    List<ChapterTitle> allChapterTitleList;
+    List<ChapterInfo> allChapterInfoList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +73,7 @@ public class NovelActivity extends AppCompatActivity {
             String str = JSON.toJSONString(novel);
             bundle.putString(Config.NOVEL_INFO, str);
 
-            String chapterListStr = JSON.toJSONString(allChapterTitleList);
+            String chapterListStr = JSON.toJSONString(allChapterInfoList);
             bundle.putString(Config.CHAPTER_LIST, chapterListStr);
 
             intent.putExtras(bundle);
@@ -132,12 +132,12 @@ public class NovelActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String str = response.body().string();
-                result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterTitle>>() {
+                result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterInfo>>() {
                 });
                 if(result.resultList==null){
                     return;
                 }
-                allChapterTitleList=result.resultList;
+                allChapterInfoList =result.resultList;
                 runOnUiThread(() -> {
                     NovelActivity.this.listViewAdapter.addDataList(Linq4j.asEnumerable(result.resultList).reverse().take(15).toList());
                     setListViewHeightBasedOnChildren(listView);

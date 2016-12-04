@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.code1912.novelapp.R;
-import com.code1912.novelapp.model.ChapterTitle;
+import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.viewholder.ChapterTitleHolder;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.List;
  */
 
 public class ChapterListAdapter extends BaseAdapter {
-    List<ChapterTitle> chapterTitles =new ArrayList<ChapterTitle>();
+    List<ChapterInfo> chapterInfos =new ArrayList<ChapterInfo>();
     Context context;
     LayoutInflater layoutInflater;
 
@@ -28,12 +28,12 @@ public class ChapterListAdapter extends BaseAdapter {
     }
     @Override
     public int getCount() {
-        return  this.chapterTitles.size();
+        return  this.chapterInfos.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return chapterTitles.get(i);
+        return chapterInfos.get(i);
     }
 
     @Override
@@ -41,22 +41,22 @@ public class ChapterListAdapter extends BaseAdapter {
         return i;
     }
 
-    public void addDataList(List<ChapterTitle> dataList){
+    public void addDataList(List<ChapterInfo> dataList){
         if(dataList==null||dataList.size()==0){
             return;
         }
-        this.chapterTitles.addAll(dataList);
+        this.chapterInfos.addAll(dataList);
         this.notifyDataSetChanged();
     }
 
-    public List<ChapterTitle> getDataList(){
-        return  new ArrayList<ChapterTitle>(this.chapterTitles);
+    public List<ChapterInfo> getDataList(){
+        return  new ArrayList<ChapterInfo>(this.chapterInfos);
     }
     public  void removeAllNovels(){
-        if(chapterTitles ==null|| chapterTitles.size()==0){
+        if(chapterInfos ==null|| chapterInfos.size()==0){
             return;
         }
-        this.chapterTitles.clear();
+        this.chapterInfos.clear();
         this.notifyDataSetChanged();
     }
 
@@ -71,7 +71,7 @@ public class ChapterListAdapter extends BaseAdapter {
         } else {
             holder = (ChapterTitleHolder) convertView.getTag();
         }
-        holder.txtTitle.setText(this.chapterTitles.get(position).title);
+        holder.txtTitle.setText(this.chapterInfos.get(position).title);
         return convertView;
     }
 }

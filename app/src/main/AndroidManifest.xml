@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity
-
                android:name=".SearchActivity"
                android:theme="@style/AppTheme.NoActionBar"
                android:label="search"
@@ -35,6 +34,10 @@
                     android:theme="@style/AppTheme.NoActionBar">
 
           </activity>
+        <activity android:name=".ChapterInfoActivity"
+                  android:label=""
+                  android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <meta-data android:name="DATABASE" android:value="novel_go.db" />
         <meta-data android:name="VERSION" android:value="3" />
         <meta-data android:name="QUERY_LOG" android:value="true" />

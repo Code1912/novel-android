@@ -141,7 +141,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if (Util.IsNullOrEmpty(query)) {
+        if (Util.isNullOrEmpty(query)) {
             return true;
         }
         this.result=null;

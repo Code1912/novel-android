@@ -1,7 +1,12 @@
 package com.code1912.novelapp.utils;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.Toast;
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +30,22 @@ public class Util {
         return re_StrTime;
     }
 
-    public static  boolean IsNullOrEmpty(String str){
+    public    static  void toast(Context context,String msg){
+        Toast   toast = Toast.makeText(context,
+                msg, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+    public static void putObject2Bundle(Bundle bundle, String key, Object obj){
+        String str = JSON.toJSONString(obj);
+        bundle.putString(key,str);
+    }
+
+
+    public  static Date  getCurrentDate(){
+        return  new Date(System.currentTimeMillis());
+    }
+    public static  boolean isNullOrEmpty(String str){
         if(str==null){
             return  true;
         }
