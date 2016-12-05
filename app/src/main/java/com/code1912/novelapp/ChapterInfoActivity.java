@@ -22,6 +22,7 @@ import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
 import com.code1912.novelapp.utils.Util;
 
+import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.Linq4j;
 
 import java.util.List;
@@ -30,7 +31,8 @@ import java.util.List;
  * Created by Code1912 on 2016/11/28.
  */
 
-public class ChapterInfoActivity extends AppCompatActivity {
+public class ChapterInfoActivity extends ActivityBase {
+
 	ScrollView scrollView;
        TextView txtContent;
 	TextView txtTitle;
@@ -42,6 +44,7 @@ public class ChapterInfoActivity extends AppCompatActivity {
 	List<ChapterInfo> chapterList;
 	int positionY;
 	boolean isTempRead=false;
+	boolean isDownloadingAll=false;
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,7 +54,7 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		txtTitle =(TextView)findViewById(R.id.novel_title);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		findViewById(R.id.btn_menu).setOnClickListener(v->this.btnMenuClick(v));
-
+		findViewById(R.id.btn_download).setOnClickListener(v->this.btnDownloadClick(v));
 		toolbar.setTitle("");
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -96,19 +99,52 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		getChapterInfo();
 	}
 	private  void btnMenuClick(View v) {
-
 		Intent newIntent = new Intent(ChapterInfoActivity.this, ChapterListActivity.class);
-
 		String str = JSON.toJSONString(novel);
 		newIntent.putExtra(Config.NOVEL_INFO, str);
 		str = JSON.toJSONString(chapterList);
+		List<ChapterInfo> tempList=JSON.parseObject(str,new TypeReference<List<ChapterInfo>>(){});
+		for (ChapterInfo info : tempList) {
+			info.content=null;
+		}
+		str = JSON.toJSONString(tempList);
 		newIntent.putExtra(Config.CHAPTER_LIST, str);
 		newIntent.putExtra(Config.IS_TEMP_READ, isTempRead);
 		newIntent.putExtra(Config.CURRENT_CHAPTER_INDEX, chapterInfo.chapter_index);
-		startActivity(newIntent);
+		showToolBar(false);
+
+		startActivityForResult(newIntent,Config.CHAPTER_LIST_ACTIVITY_RESULT);
 	}
+
+	private  void btnDownloadClick(View v){
+		if(Linq4j.asEnumerable(chapterList).all(n->n.is_downloaded)){
+			showMsg("已经全部下载完成了");
+			return;
+		}
+		if(isDownloadingAll){
+			showMsg("已经开始下载.....");
+			return;
+		}
+
+		isDownloadingAll=true;
+		showMsg("已经开始下载.....");
+		for (ChapterInfo info : chapterList) {
+			if(info.is_downloaded){
+				continue;
+			}
+			NovelBiz.instance.getChapterInfo(info,!isTempRead,(res,v1)->{
+
+			});
+		}
+
+	}
+
 	private  void getChapterList(){
-		chapterList=ChapterInfo.find(ChapterInfo.class,"novelid=?",new String[]{String.valueOf(novel.getId())},"","id asc","");
+		if(isTempRead){
+			chapterList=JSON.parseObject(getIntent().getStringExtra(Config.CHAPTER_LIST),new TypeReference<List<ChapterInfo>>(){});
+			return;
+		}
+		chapterList=ChapterInfo.find(ChapterInfo.class,String.format( "novelid=%d and type=%d ",novel.getId(),novel.type),null,"","chapterindex asc","");
 		chapterList=Linq4j.asEnumerable(chapterList).orderBy(p->p.getId()).toList();
 	}
 
@@ -137,7 +173,9 @@ public class ChapterInfoActivity extends AppCompatActivity {
 			return;
 		}
 		chapterInfo.position=moveY;
-		ChapterInfo.save(chapterInfo);
+		if(!isTempRead) {
+			ChapterInfo.save(chapterInfo);
+		}
 		scrollView.scrollTo(0,moveY);
 	}
 	private  void toNext(int i) {
@@ -151,9 +189,11 @@ public class ChapterInfoActivity extends AppCompatActivity {
 			return;
 		}
 		chapterInfo.position=0;
-		chapterInfo.save(chapterInfo);
+		if(!isTempRead){
+			chapterInfo.save(chapterInfo);
+		}
 		chapterInfo=chapterList.get(index+i);
-		novel.last_read_chapter_id=chapterInfo.getId();
+		novel.last_chapter_index=chapterInfo.chapter_index;
 		getChapterInfo();
 	}
         private boolean getNovel(){
@@ -165,10 +205,10 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		return  true;
 	}
 	private  void getChapterInfo() {
-		if (novel.last_read_chapter_id < 1) {
+		if (novel.last_chapter_index < 1) {
 			chapterInfo = chapterList.get(0);
 		} else {
-			chapterInfo = Linq4j.asEnumerable(chapterList).first(p -> p.getId() == novel.last_read_chapter_id);
+			chapterInfo = Linq4j.asEnumerable(chapterList).first(p -> p.chapter_index== novel.last_chapter_index);
 		}
 		if (chapterInfo == null) {
 			Util.toast(ChapterInfoActivity.this, "获取章节信息失败");
@@ -190,16 +230,14 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		});
 	}
 
-	private  void showMsg(String msg) {
-		runOnUiThread(() -> {
-			Util.toast(this, msg);
-		});
-	}
 	private  void updateChapterInfo(){
 		chapterInfo.is_readed=true;
 		chapterInfo.is_downloaded=true;
+		if(isTempRead){
+			return;
+		}
 		ChapterInfo.save(chapterInfo);
-		novel.last_read_chapter_id=chapterInfo.getId();
+		novel.last_chapter_index=chapterInfo.chapter_index;
 		novel.read_chapter_count=ChapterInfo.count(ChapterInfo.class,"isreaded='1' and novelid=?",new String[]{  String.valueOf(novel.getId())});
 		Novel.save(novel);
 		notifyReadCountChanged();
@@ -209,7 +247,7 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		runOnUiThread(()->{
 			String content=Util.isNullOrEmpty(chapterInfo.content)?"":chapterInfo.content;
 			txtTitle.setText(Html.fromHtml(chapterInfo.title));
-			txtContent.setText(Html.fromHtml(content));
+			txtContent.setText (content.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"));
 			scrollView.scrollTo(0,chapterInfo.position);
 		});
 	}
@@ -225,4 +263,16 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		sendBroadcast(intent);
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		if(resultCode==Config.CHAPTER_LIST_ACTIVITY_RESULT){
+			 int index=data.getIntExtra(Config.CURRENT_CHAPTER_INDEX,0);
+			 chapterList =JSON.parseArray(data.getStringExtra(Config.CHAPTER_LIST),ChapterInfo.class);
+                         chapterInfo= Linq4j.asEnumerable(chapterList).first(n->n.chapter_index==index);
+			 novel.last_chapter_index=chapterInfo.chapter_index;
+			 getChapterInfo();
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 }

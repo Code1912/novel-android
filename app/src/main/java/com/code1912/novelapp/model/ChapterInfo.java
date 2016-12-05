@@ -22,4 +22,5 @@ public class ChapterInfo extends SugarRecord implements Serializable {
     public boolean is_downloaded;
     @Ignore
     public boolean is_current;
+    public  int type;
 }

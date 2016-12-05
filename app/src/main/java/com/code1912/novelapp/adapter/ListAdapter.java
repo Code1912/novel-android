@@ -26,6 +26,7 @@ public class ListAdapter<T> extends BaseAdapter {
     Context context;
     LayoutInflater layoutInflater;
     Class<ViewHolderBase> holderClass;
+    ViewHolderBase.OnItemChildClick<T> onItemChildClick;
     ViewHolderBase holder;
     int itemViewId;
     public ListAdapter(Context context, Class<ViewHolderBase> holderClass,int viewId) {
@@ -60,6 +61,9 @@ public class ListAdapter<T> extends BaseAdapter {
     public Enumerable<T> getDataList(){
         return Linq4j.asEnumerable(this.dataList);
     }
+    public List<T> getList(){
+        return this.dataList;
+    }
     public void addData(T data) {
         this.dataList.add(data);
         this.notifyDataSetChanged();
@@ -68,7 +72,13 @@ public class ListAdapter<T> extends BaseAdapter {
         this.dataList.add(index,data);
         this.notifyDataSetChanged();
     }
-    public void removeAllNovels() {
+
+    public void removeAt(int index) {
+        this.dataList.remove(index);
+        this.notifyDataSetChanged();
+    }
+
+    public void removeAll() {
         if (dataList == null || dataList.size() == 0) {
             return;
         }
@@ -76,6 +86,9 @@ public class ListAdapter<T> extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
+    public void setOnItemChildClick(ViewHolderBase.OnItemChildClick<T> onItemChildClick){
+        this.onItemChildClick=onItemChildClick;
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         //  System.out.println("getView " + position + " " + convertView);
@@ -102,6 +115,7 @@ public class ListAdapter<T> extends BaseAdapter {
             holder = (ViewHolderBase) convertView.getTag();
         }
         holder.setViewInfo(context, this.dataList.get(position));
+        holder.setOnItemChildClick(this.onItemChildClick);
         return convertView;
     }
 }

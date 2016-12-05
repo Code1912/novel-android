@@ -94,6 +94,20 @@ public class NovelBiz {
 		});
 	}
 
+	public void getChapterInfo(ChapterInfo info, boolean isNeedSave, ChapterInfoCallBack callBack){
+		this.getChapterInfo(info.url,(result,success)->{
+			if(result==null){
+				callBack.onPost(null,false);
+				return;
+			}
+			info.content=result.content;
+			info.is_downloaded=true;
+			if(isNeedSave&&!Util.isNullOrEmpty(result.content)){
+				info.save();
+			}
+			callBack.onPost(result,false);
+		});
+	}
 	public  void getNewChapterList(long novelId,ChapterListCallBack callBack) {
 		Novel novel = Config.getNovelListLinq().first(p -> p.getId() == novelId);
 		if (novel == null) {

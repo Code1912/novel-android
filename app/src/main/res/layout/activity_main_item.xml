@@ -4,11 +4,11 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" android:paddingBottom="5dp" >
+
+                android:paddingBottom="5dp" >
 
 
-        <LinearLayout android:layout_marginTop="5dp"
+        <LinearLayout android:layout_marginTop="15dp"
                       android:orientation="vertical"
                       android:layout_width="match_parent"
                       android:layout_height="match_parent"
@@ -49,4 +49,13 @@
     <ImageView
         android:layout_width="wrap_content"  android:id="@+id/icon_has_new" android:src="@drawable/ic_has_new"
         android:layout_height="wrap_content"  android:layout_gravity="top|right"/>
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"  android:background="@android:color/transparent"
+        android:id="@+id/item_mask"></LinearLayout>
+    <ImageView
+    android:layout_width="wrap_content"  android:id="@+id/icon_trash" android:src="@mipmap/trash"
+
+    android:layout_height="wrap_content"  android:layout_gravity="top|right"/>
 </FrameLayout>

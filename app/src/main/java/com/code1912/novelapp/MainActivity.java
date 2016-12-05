@@ -17,7 +17,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.code1912.novelapp.adapter.ListAdapter;
 import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.model.ChapterInfo;
-import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
 import com.code1912.novelapp.utils.Util;
@@ -46,13 +45,36 @@ public class MainActivity extends AppCompatActivity {
         novelListAdapter=new ListAdapter(this, MainGridItemViewHolder.class,R.layout.activity_main_item);
         gridView.setAdapter(novelListAdapter);
         novelListAdapter.addDataList(Config.BookList);
-        gridView.setOnItemClickListener((v,v1,index,v3)->{
+        novelListAdapter.setOnItemChildClick((v,data,id)->{
+            if(id==R.id.icon_trash){
+                int index=novelListAdapter.getList().indexOf(data);
+                novelListAdapter.removeAt(index);
+                data.delete();
+                ChapterInfo.deleteAll(ChapterInfo.class,String.format("novelid=%d",data.getId()));
+            }
+            if(id==R.id.item_mask){
+                hideTrash();
+            }
+        });
+
+        gridView.setOnItemLongClickListener((v,v1,position,v3)-> {
+            novelListAdapter.getDataList().foreach(n -> {
+                n.isShowTrash = true;
+                return n;
+            });
+            novelListAdapter.notifyDataSetChanged();
+            return true;
+        });
+
+        gridView.setOnItemClickListener((v,v1,index,id)->{
+            hideTrash();
             Novel novel=  (Novel) novelListAdapter.getItem(index) ;
             Intent intent = new Intent(MainActivity.this,ChapterInfoActivity.class);
             intent.putExtra(Config.NOVEL_INFO,JSON.toJSONString(novel));
             intent.putExtra(Config.IS_TEMP_READ,false);
             startActivity(intent);
         });
+
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark    );
         swipeRefreshLayout.setOnRefreshListener(()->{
@@ -69,7 +91,13 @@ public class MainActivity extends AppCompatActivity {
         });
         registerBroadcast();
     }
-
+    private  void hideTrash(){
+        novelListAdapter.getDataList().foreach(n -> {
+            n.isShowTrash = false;
+            return n;
+        });
+        novelListAdapter.notifyDataSetChanged();
+    }
     private  void registerBroadcast() {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -101,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         if(item==null){
             return;
         }
-        item.last_read_chapter_id=novel.last_read_chapter_id;
+        item.last_chapter_index=novel.last_chapter_index;
         item.read_chapter_count=novel.read_chapter_count;
         runOnUiThread(()->{
             novelListAdapter.notifyDataSetChanged();
@@ -185,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.main_search) {
+            hideTrash();
             Intent intent = new Intent(MainActivity.this,SearchActivity.class);
             startActivity(intent);
             return true;

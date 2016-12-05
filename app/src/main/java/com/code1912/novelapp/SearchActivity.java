@@ -3,15 +3,12 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.code1912.novelapp.adapter.ListAdapter;
 import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.extend.PullToRefreshListView;
@@ -21,17 +18,13 @@ import com.code1912.novelapp.utils.Util;
 import com.code1912.novelapp.viewholder.SearchItemViewHolder;
 import com.code1912.novelapp.utils.Config;
 
-import java.io.IOException;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+
 /**
  * Created by Code1912 on 2016/11/28.
  */
 
-public class SearchActivity extends AppCompatActivity implements   SearchView.OnQueryTextListener {
+public class SearchActivity extends ActivityBase implements   SearchView.OnQueryTextListener {
     private   Menu mMenu;
     OkHttpClient mOkHttpClient = new OkHttpClient();
     CommonResponse<Novel> result;
@@ -86,7 +79,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
 
         searchView.setOnQueryTextListener(this);
         searchView.setOnCloseListener(()->{
-            this.adapter.removeAllNovels();
+            this.adapter.removeAll();
             return  false;
         });
 
@@ -110,6 +103,7 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
     private  void search(String keyword){
         int pageIndex=result==null?-1:result.pageIndex+1;
         NovelBiz.instance.search(keyword,pageIndex,(result,isSuccess)->{
+            this.showLoading(false);
             SearchActivity.this.setRefreshing(false);
             SearchActivity.this.result=result;
             if(result.resultList==null){
@@ -135,7 +129,8 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
         }
         this.result=null;
         this.queryText=query;
-        this.adapter.removeAllNovels();
+        this.adapter.removeAll();
+        this.showLoading(true);
         this.search(query);
         return false;
     }

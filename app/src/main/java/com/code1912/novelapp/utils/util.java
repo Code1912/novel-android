@@ -32,10 +32,11 @@ public class Util {
 
     public    static  void toast(Context context,String msg){
         Toast   toast = Toast.makeText(context,
-                msg, Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
+                msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, 0, 50);
         toast.show();
     }
+
     public static void putObject2Bundle(Bundle bundle, String key, Object obj){
         String str = JSON.toJSONString(obj);
         bundle.putString(key,str);

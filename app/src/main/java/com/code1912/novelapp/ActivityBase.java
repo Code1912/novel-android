@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.code1912.novelapp.extend.LoadingView;
+import com.code1912.novelapp.utils.Util;
 
 /**
  * Created by Code1912 on 2016/12/5.
@@ -39,9 +40,18 @@ public class ActivityBase extends AppCompatActivity {
 	}
 
 	protected  void showLoading(boolean isShow){
-		if(isShow)
-			loadingView.show();
-		else
-			loadingView.hide();
+		runOnUiThread(()->{
+			if(isShow)
+				loadingView.show();
+			else
+				loadingView.hide();
+		});
+
+	}
+
+	protected   void showMsg(String msg){
+		runOnUiThread(()->{
+			Util.toast(this,msg);
+		});
 	}
 }

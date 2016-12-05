@@ -1,8 +1,10 @@
 package com.code1912.novelapp.viewholder;
 
 import android.content.Context;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -21,6 +23,9 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 	public TextView txtTitle;
 	public TextView txtRead;
 	public TextView txtAll;
+	public ImageView trashImg;
+	public Novel novel;
+	public LinearLayout mask;
 	public MainGridItemViewHolder(View itemView) {
 		super(itemView);
 		initView(itemView);
@@ -32,6 +37,21 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 		this.txtRead=(TextView)view.findViewById(R.id.novel_read_count);
 		this.txtAll=(TextView)view.findViewById(R.id.novel_all_chapter_count);
 		this.ishasNewImg=(ImageView)view.findViewById(R.id.icon_has_new);
+		this.trashImg=(ImageView)view.findViewById(R.id.icon_trash);
+                this.trashImg.setOnClickListener(v->{
+			callItemChildClick(v,novel,R.id.icon_trash);
+		});
+		this.mask=(LinearLayout)view.findViewById(R.id.item_mask);
+		this.mask.setOnTouchListener((v,e)->{
+			if(this.novel==null){
+				return  false;
+			}
+			if(this.novel.isShowTrash){
+				callItemChildClick(this.mask,novel,R.id.item_mask);
+				return  true;
+			}
+			return  false;
+		});
 	}
 	@Override
 	public void setViewInfo(Context context, Novel info) {
@@ -45,5 +65,7 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 		this.txtRead.setText(String.valueOf(info.read_chapter_count));
 		this.txtAll.setText(String.valueOf(info.all_chapter_count));
 		this.ishasNewImg.setVisibility(info.is_have_new ? View.VISIBLE : View.INVISIBLE);
+		this.trashImg.setVisibility(info.isShowTrash ? View.VISIBLE : View.INVISIBLE);
+                this.novel=info;
 	}
 }

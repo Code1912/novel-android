@@ -37,7 +37,7 @@
                                                           android:layout_weight="1.0"
                                             >
                                                         <TextView android:id="@+id/chapter_content"
-                                                                  android:lineSpacingExtra="9dp"
+                                                                  android:lineSpacingExtra="9dp" android:textSize="17dp"
                                                             android:layout_width="match_parent"
                                                             android:layout_height="wrap_content"/>
 
@@ -45,17 +45,17 @@
                      </LinearLayout>
 
    <TableLayout    android:layout_gravity="bottom" android:id="@+id/chapter_footer"
-                    android:layout_width="match_parent"
+                    android:layout_width="match_parent" android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:stretchColumns="1,2,3" >
         <TableRow>
             <Button   android:layout_column="1" android:id="@+id/btn_menu" android:drawableTop="@mipmap/menu"
                       android:text="目录" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
                     />
-            <Button   android:layout_column="1" android:drawableTop="@mipmap/down"
+            <Button   android:layout_column="1" android:drawableTop="@mipmap/down" android:id="@+id/btn_download"
                       android:text="下载" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
                      />
-            <Button android:id="@+id/btn_add" android:layout_column="1" android:drawableTop="@mipmap/setting"
+            <Button android:id="@+id/btn_setting" android:layout_column="1" android:drawableTop="@mipmap/setting"
                     android:text="设置" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
                    />
         </TableRow>

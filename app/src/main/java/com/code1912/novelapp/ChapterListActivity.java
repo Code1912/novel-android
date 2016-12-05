@@ -1,9 +1,12 @@
 package com.code1912.novelapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -31,12 +34,19 @@ public class ChapterListActivity extends ActivityBase {
 	ListAdapter<ChapterInfo> listAdapter;
 	ListView listView;
 	ImageView refreshView;
+	Toolbar toolbar;
 	boolean isTempRead;
 	int currentChapterIndex=-1;
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chapter_list);
+
+		toolbar = (Toolbar) findViewById(R.id.toolbar);
+		toolbar.setTitle("");
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		toolbar.setNavigationOnClickListener(v -> ChapterListActivity.this.finish());
 		listAdapter=new ListAdapter(this, ChapterListTitleViewHolder.class,R.layout.activity_chapter_list_item);
 		listView=(ListView) findViewById(R.id.chapter_list_listView);
 		refreshView=(ImageView) findViewById(R.id.btn_refresh);
@@ -49,17 +59,32 @@ public class ChapterListActivity extends ActivityBase {
 		isTempRead=getIntent().getBooleanExtra(Config.IS_TEMP_READ,true);
 		currentChapterIndex=getIntent().getIntExtra(Config.CURRENT_CHAPTER_INDEX,-1);
 		novel= JSON.parseObject(getIntent().getStringExtra(Config.NOVEL_INFO),Novel.class);
+		toolbar.setTitle(novel.name);
 		chapterInfoList=JSON.parseObject(getIntent().getStringExtra(Config.CHAPTER_LIST),new TypeReference<List<ChapterInfo>>(){});
-		Linq4j.asEnumerable(chapterInfoList).first(p->{
-			if(p.chapter_index==currentChapterIndex){
-				p.is_current=true;
+		int index=0;
+		for (ChapterInfo info : chapterInfoList) {
+			if(info.chapter_index==currentChapterIndex){
+				info.is_current=true;
+				break;
 			}
-			return p.chapter_index==currentChapterIndex;
-		});
+			index++;
+		}
+
 		listAdapter.addDataList(chapterInfoList);
+		listView.setOnItemClickListener((v,v1,v2,v3)->onItemClick(v,v1,v2,v3));
+		listView.setSelection(index);
 		if(isTempRead){
 			refreshView.setVisibility(View.GONE);
 		}
+	}
+
+	public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+		ChapterInfo info=(ChapterInfo)listAdapter.getItem(i);
+		Intent intent=new Intent();
+                intent.putExtra(Config.CURRENT_CHAPTER_INDEX,info.chapter_index);
+		intent.putExtra(Config.CHAPTER_LIST,JSON.toJSONString(chapterInfoList));
+                this.setResult(Config.CHAPTER_LIST_ACTIVITY_RESULT,intent);
+		this.finish();
 	}
 
 	private  void btnRefreshClick(View v) {
@@ -84,11 +109,11 @@ public class ChapterListActivity extends ActivityBase {
 		});
 	}
 
-	private  void showMsg(String str){
-		runOnUiThread(() -> {
-			Util.toast(ChapterListActivity.this, str);
-			showLoading(false);
-		});
+
+	@Override
+	protected    void showMsg(String str) {
+		super.showMsg(str);
+		showLoading(false);
 	}
 
 

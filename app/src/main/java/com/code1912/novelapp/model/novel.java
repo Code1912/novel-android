@@ -31,13 +31,16 @@ public class Novel extends SugarRecord implements Serializable {
     public  long read_chapter_count;
     public int all_chapter_count;
     public boolean is_have_new;
-    public long last_read_chapter_id;
+    public  int last_chapter_index;
     @Ignore
     public  boolean refreshed;
+    @Ignore
+    public  boolean isShowTrash;
     public Date add_date;
      public  String getLastEditDate(){
        return    Util.getStrTime(this.dateModified,"yyyy-MM-dd HH:MM:ss");
      }
+    public int type;
     public Novel(){
 
     }

@@ -17,10 +17,11 @@ import java.util.Random;
  */
 
 public class Config {
-	public static String ApiHost = "http://192.168.0.107:3000";
+	public static String ApiHost = "http://www.code1912.cn:3000";
 	public static final String TRANSPORT_KEY = "TRANSPORT_KEY";
 	public static final String NOVEL_INFO = "NOVEL_INFO";
 	public static final String CHAPTER_LIST = "CHAPTER_LIST";
+	public static final String CHAPTER_INFO = "CHAPTER_INFO";
 	public static final String ADD_NOVEL_KEY = "ADD_NOVEL_KEY";
 	public static final String NOTIFY_NOVEL_KEY = "ADD_NOVEL_KEY";
 	public static final String KEY = "KEY";
@@ -29,6 +30,8 @@ public class Config {
 	public static final String BROADCAST_ADD_NOVEL = "BROADCAST_ADD_NOVEL";
 	public static final String BROADCAST_NOTIFY_NOVEL = "BROADCAST_NOTIFY_NOVEL";
 	public final static List<Novel> BookList=new ArrayList<>();
+
+	public static  final  int CHAPTER_LIST_ACTIVITY_RESULT=90;
 
 	public static Enumerable<Novel> getNovelListLinq(){
 		return  Linq4j.asEnumerable(Config.BookList);
