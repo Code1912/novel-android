@@ -50,7 +50,8 @@ public class ChapterInfoActivity extends AppCompatActivity {
 		txtContent =(TextView)findViewById(R.id.chapter_content);
 		txtTitle =(TextView)findViewById(R.id.novel_title);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
-		toolbar.getBackground().setAlpha(100);
+		findViewById(R.id.btn_menu).setOnClickListener(v->this.btnMenuClick(v));
+
 		toolbar.setTitle("");
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,11 +88,24 @@ public class ChapterInfoActivity extends AppCompatActivity {
 
 		  //  scrollView.get
 		});*/
+		isTempRead=getIntent().getBooleanExtra(Config.IS_TEMP_READ,true);
 		if(!getNovel()){
 			return;
 		}
 		getChapterList();
 		getChapterInfo();
+	}
+	private  void btnMenuClick(View v) {
+
+		Intent newIntent = new Intent(ChapterInfoActivity.this, ChapterListActivity.class);
+
+		String str = JSON.toJSONString(novel);
+		newIntent.putExtra(Config.NOVEL_INFO, str);
+		str = JSON.toJSONString(chapterList);
+		newIntent.putExtra(Config.CHAPTER_LIST, str);
+		newIntent.putExtra(Config.IS_TEMP_READ, isTempRead);
+		newIntent.putExtra(Config.CURRENT_CHAPTER_INDEX, chapterInfo.chapter_index);
+		startActivity(newIntent);
 	}
 	private  void getChapterList(){
 		chapterList=ChapterInfo.find(ChapterInfo.class,"novelid=?",new String[]{String.valueOf(novel.getId())},"","id asc","");
@@ -183,6 +197,7 @@ public class ChapterInfoActivity extends AppCompatActivity {
 	}
 	private  void updateChapterInfo(){
 		chapterInfo.is_readed=true;
+		chapterInfo.is_downloaded=true;
 		ChapterInfo.save(chapterInfo);
 		novel.last_read_chapter_id=chapterInfo.getId();
 		novel.read_chapter_count=ChapterInfo.count(ChapterInfo.class,"isreaded='1' and novelid=?",new String[]{  String.valueOf(novel.getId())});

@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.bumptech.glide.Glide;
 import com.code1912.novelapp.adapter.ChapterListAdapter;
+import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
@@ -24,6 +25,7 @@ import com.code1912.novelapp.utils.Config;
 import org.apache.calcite.linq4j.Linq4j;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -124,31 +126,19 @@ public class NovelActivity extends AppCompatActivity {
         if (novel == null) {
             return;
         }
-        Request request = new Request.Builder()
-                .url(Config.getChapterListUrl(novel.listPage_url[0]))
-                .build();
-        Call call = mOkHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String str = response.body().string();
-                result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterInfo>>() {
-                });
-                if(result.resultList==null){
-                    return;
-                }
-                allChapterInfoList =result.resultList;
-                runOnUiThread(() -> {
-                    NovelActivity.this.listViewAdapter.addDataList(Linq4j.asEnumerable(result.resultList).reverse().take(15).toList());
-                    setListViewHeightBasedOnChildren(listView);
-                    scrollView.fullScroll(ScrollView.FOCUS_UP);
-                });
+        NovelBiz.instance.getChapterList(novel.current_url,(list,isSuccess)->{
+            if(!isSuccess){
+                allChapterInfoList=new ArrayList<ChapterInfo>();
+                scrollView.fullScroll(ScrollView.FOCUS_UP);
+                return;
             }
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
+            allChapterInfoList =list;
+            runOnUiThread(() -> {
+                NovelActivity.this.listViewAdapter.addDataList(Linq4j.asEnumerable(list).reverse().take(10).toList());
+                setListViewHeightBasedOnChildren(listView);
+                scrollView.fullScroll(ScrollView.FOCUS_UP);
+            });
         });
+
     }
 }

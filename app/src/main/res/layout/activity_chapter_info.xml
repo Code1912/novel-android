@@ -16,7 +16,7 @@
         android:id="@+id/toolbar" android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/black"
+        android:background="@color/colorBlackC1"
         app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
 </android.support.design.widget.AppBarLayout>
@@ -44,20 +44,20 @@
                                         </ScrollView>
                      </LinearLayout>
 
-   <TableLayout  android:visibility="gone"   android:layout_gravity="bottom" android:id="@+id/chapter_footer"
+   <TableLayout    android:layout_gravity="bottom" android:id="@+id/chapter_footer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:stretchColumns="1,2,3" >
         <TableRow>
-            <Button   android:layout_column="1" android:id="@+id/btn_start_read"
-                      android:text="开始阅读" android:background="@color/colorPrimary"  android:textColor="@color/colorWhite"
-                      android:layout_height="@dimen/btn_height"/>
-            <Button   android:layout_column="1"
-                      android:text="开始阅读" android:background="@color/colorPrimary"  android:textColor="@color/colorWhite"
-                      android:layout_height="@dimen/btn_height"/>
-            <Button android:id="@+id/btn_add" android:layout_column="1"
-                    android:text="加入书架" android:background="@drawable/btn_join_style"  android:textColor="@color/colorPrimary"
-                    android:layout_height="@dimen/btn_height"/>
+            <Button   android:layout_column="1" android:id="@+id/btn_menu" android:drawableTop="@mipmap/menu"
+                      android:text="目录" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
+                    />
+            <Button   android:layout_column="1" android:drawableTop="@mipmap/down"
+                      android:text="下载" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
+                     />
+            <Button android:id="@+id/btn_add" android:layout_column="1" android:drawableTop="@mipmap/setting"
+                    android:text="设置" android:background="@color/colorBlackC1"  android:textColor="@color/colorWhite"
+                   />
         </TableRow>
 
     </TableLayout>

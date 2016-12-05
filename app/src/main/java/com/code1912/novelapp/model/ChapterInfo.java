@@ -1,6 +1,7 @@
 package com.code1912.novelapp.model;
 
 import com.orm.SugarRecord;
+import com.orm.dsl.Ignore;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,4 +18,8 @@ public class ChapterInfo extends SugarRecord implements Serializable {
     public Date add_date;
     public  boolean is_readed;
     public int position;
+    public  int chapter_index;
+    public boolean is_downloaded;
+    @Ignore
+    public boolean is_current;
 }

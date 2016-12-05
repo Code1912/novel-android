@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="true" android:background="@android:color/white"
     tools:context="com.code1912.novelapp.MainActivity">
 
     <android.support.design.widget.AppBarLayout

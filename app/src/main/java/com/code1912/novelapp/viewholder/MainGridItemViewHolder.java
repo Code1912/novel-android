@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.code1912.novelapp.R;
 import com.code1912.novelapp.extend.SuperBitmapImageViewTarget;
 import com.code1912.novelapp.model.Novel;
@@ -38,6 +39,7 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 			.load(info.image)
 			.centerCrop()
 			.crossFade()
+			.diskCacheStrategy(DiskCacheStrategy.SOURCE)
 			.placeholder(R.mipmap.ic_launcher).into(this.image);
 		this.txtTitle.setText(info.name);
 		this.txtRead.setText(String.valueOf(info.read_chapter_count));

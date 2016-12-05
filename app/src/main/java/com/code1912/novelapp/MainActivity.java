@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
         gridView.setOnItemClickListener((v,v1,index,v3)->{
             Novel novel=  (Novel) novelListAdapter.getItem(index) ;
             Intent intent = new Intent(MainActivity.this,ChapterInfoActivity.class);
-
             intent.putExtra(Config.NOVEL_INFO,JSON.toJSONString(novel));
+            intent.putExtra(Config.IS_TEMP_READ,false);
             startActivity(intent);
         });
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
     private  void addNovel(Intent intent){
         String str = intent.getExtras().getString(Config.NOVEL_INFO);
         Novel novel = JSON.parseObject(str, Novel.class);
-        novel.current_url=novel.listPage_url[0];
         if (novel == null) {
             return;
         }
@@ -133,15 +132,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private  void refresh(Novel novel){
-        NovelBiz.instance.getChapterList(novel.current_url,(call,response)->{
-            final String str = response.body().string();
-            CommonResponse<ChapterInfo>     result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterInfo>>() {
-            });
-            novel.is_have_new=novel.all_chapter_count<result.resultList.size();
-            novel.all_chapter_count=result.resultList.size();
+        NovelBiz.instance.getChapterList(novel.current_url,(list,isSuccess)->{
+             if(!isSuccess){
+                 novel.save();
+                 novel.refreshed=true;
+                 refreshUI();
+                 return;
+             }
+            novel.is_have_new=list.size()>novel.all_chapter_count;
             if(novel.is_have_new){
-                for (ChapterInfo chapterInfo : result.resultList) {
-                    List<ChapterInfo> titles=  ChapterInfo.find(ChapterInfo.class," novelid=? and title=?",new String[]{String.valueOf(novel.getId()), chapterInfo.title});
+                for (ChapterInfo chapterInfo : list) {
+                    List<ChapterInfo> titles=  ChapterInfo.find(ChapterInfo.class," novelid=? and chapter_index=?",new String[]{String.valueOf(novel.getId()), String.valueOf(chapterInfo.chapter_index)});
                     if(titles!=null||titles.size()>0){
                         continue;
                     }
@@ -150,10 +151,9 @@ public class MainActivity extends AppCompatActivity {
                     ChapterInfo.save(chapterInfo);
                 }
             }
-            Novel.save(novel);
             novel.refreshed=true;
-            refreshUI();
-        },(c,i)->{
+            novel.all_chapter_count=list.size();
+            novel.save();
             novel.refreshed=true;
             refreshUI();
         });
@@ -165,9 +165,8 @@ public class MainActivity extends AppCompatActivity {
         }
         runOnUiThread(()->{
             novelListAdapter.notifyDataSetChanged();
-
             swipeRefreshLayout.setRefreshing(false);
-            Novel.saveInTx(novelListAdapter.getDataList().toList());
+         //   Novel.saveInTx(novelListAdapter.getDataList().toList());
         });
     }
     @Override

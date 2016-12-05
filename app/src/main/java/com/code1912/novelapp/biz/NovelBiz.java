@@ -12,7 +12,12 @@ import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
 import com.code1912.novelapp.utils.Util;
 
+import org.apache.calcite.linq4j.Enumerable;
+import org.apache.calcite.linq4j.Linq4j;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -49,18 +54,68 @@ public class NovelBiz {
 		});
 	}
 
-	private void search(String keyword, int pageIndex, SuccessCallBack successCallBack, FailCallBack failCallBack) {
-		 query(Config.getSearchUrl(keyword, pageIndex),successCallBack,failCallBack);
+	public void search(String keyword, int pageIndex, SearchCallBack callBack ) {
+		 query(Config.getSearchUrl(keyword, pageIndex), (call, response) -> {
+			 try {
+				 String str = response.body().string();
+				 CommonResponse<Novel> result = JSON.parseObject(str, new TypeReference<CommonResponse<Novel>>() {
+				 });
+				 if (result == null ) {
+					 callBack.onPost(null, false);
+					 return;
+				 }
+				 callBack.onPost(result, true);
+			 } catch (IOException e) {
+				 Log.e("Search Novel Error:", e.getMessage());
+				 callBack.onPost(null, false);
+			 }
+		 }, (c, error) -> {
+			 callBack.onPost(null, false);
+		 });
 	}
 
-	public  void getChapterList(String url, SuccessCallBack successCallBack, FailCallBack failCallBack){
-		query(Config.getChapterListUrl(url),successCallBack,failCallBack);
+	public void getChapterList(String url,ChapterListCallBack callBack) {
+		query(Config.getChapterListUrl(url), (call, response) -> {
+			try {
+				String str = response.body().string();
+				CommonResponse<ChapterInfo> result = JSON.parseObject(str, new TypeReference<CommonResponse<ChapterInfo>>() {
+				});
+				if (result == null || result.resultList == null) {
+					callBack.onPost(null, false);
+					return;
+				}
+				callBack.onPost(result.resultList, true);
+			} catch (IOException e) {
+				Log.e("Get ChapterList Error:", e.getMessage());
+				callBack.onPost(null, false);
+		}
+		}, (c, error) -> {
+			callBack.onPost(null, false);
+		});
 	}
 
-	private   void getChapterInfo(String url, SuccessCallBack successCallBack, FailCallBack failCallBack){
-		query(Config.getChapterInfoUrl(url),successCallBack,failCallBack);
+	public  void getNewChapterList(long novelId,ChapterListCallBack callBack) {
+		Novel novel = Config.getNovelListLinq().first(p -> p.getId() == novelId);
+		if (novel == null) {
+			callBack.onPost(null, false);
+			return;
+		}
+		getChapterList(novel.current_url, (resultList, isSuccess) -> {
+			if (!isSuccess) {
+				callBack.onPost(null, false);
+				return;
+			}
+			List<ChapterInfo> oldChapters = ChapterInfo.find(ChapterInfo.class, String.format("novelid=%d", novel.getId()));
+			if (oldChapters == null) {
+				oldChapters = new ArrayList<ChapterInfo>();
+			}
+			Enumerable<ChapterInfo> queryList=Linq4j.asEnumerable(oldChapters);
+			List<ChapterInfo> newList=Linq4j.asEnumerable(resultList).where(n->{
+				return  !queryList.any(p->p.chapter_index==n.chapter_index);
+			}).toList();
+			callBack.onPost(newList,true);
+		});
 	}
-
 	public void getChapterInfo(String url,ChapterInfoCallBack callBack) {
 		query(Config.getChapterInfoUrl(url), (call, response) -> {
 			try {
@@ -92,6 +147,14 @@ public class NovelBiz {
 
 	public interface ChapterInfoCallBack {
 		void onPost(ChapterInfo str,boolean success);
+	}
+
+	public interface ChapterListCallBack {
+		void onPost(List<ChapterInfo> list, boolean success);
+	}
+
+	public interface SearchCallBack {
+		void onPost(CommonResponse<Novel> response, boolean success);
 	}
 }
 

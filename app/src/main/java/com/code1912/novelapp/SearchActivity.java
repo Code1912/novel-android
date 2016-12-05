@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.code1912.novelapp.adapter.ListAdapter;
+import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.extend.PullToRefreshListView;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
@@ -108,27 +109,15 @@ public class SearchActivity extends AppCompatActivity implements   SearchView.On
 
     private  void search(String keyword){
         int pageIndex=result==null?-1:result.pageIndex+1;
-        Request request = new Request.Builder()
-                .url(Config.getSearchUrl(keyword,pageIndex))
-                .build();
-        Call   call = mOkHttpClient.newCall(request);
-        call.enqueue(new Callback()
-        {
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String str = response.body().string();
-                Log.v("------------", str);
-                result = JSON.parseObject(str, new TypeReference<CommonResponse<Novel>>(){});
-                runOnUiThread(()->{
-                    SearchActivity.this.adapter.addDataList(result.resultList);
-                });
-                SearchActivity.this.setRefreshing(false);
+        NovelBiz.instance.search(keyword,pageIndex,(result,isSuccess)->{
+            SearchActivity.this.setRefreshing(false);
+            SearchActivity.this.result=result;
+            if(result.resultList==null){
+                return;
             }
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                SearchActivity.this.setRefreshing(false);
-            }
+            runOnUiThread(()->{
+                SearchActivity.this.adapter.addDataList(result.resultList);
+            });
         });
     }
 
