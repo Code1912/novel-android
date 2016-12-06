@@ -109,7 +109,7 @@ public class NovelBiz {
 		});
 	}
 	public  void getNewChapterList(long novelId,ChapterListCallBack callBack) {
-		Novel novel = Config.getNovelListLinq().first(p -> p.getId() == novelId);
+		Novel novel = Novel.findById(Novel.class,novelId);
 		if (novel == null) {
 			callBack.onPost(null, false);
 			return;

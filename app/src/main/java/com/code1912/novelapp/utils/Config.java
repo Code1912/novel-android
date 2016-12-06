@@ -29,13 +29,9 @@ public class Config {
 	public static final String CURRENT_CHAPTER_INDEX = "CURRENT_CHAPTER_INDEX";
 	public static final String BROADCAST_ADD_NOVEL = "BROADCAST_ADD_NOVEL";
 	public static final String BROADCAST_NOTIFY_NOVEL = "BROADCAST_NOTIFY_NOVEL";
-	public final static List<Novel> BookList=new ArrayList<>();
-
 	public static  final  int CHAPTER_LIST_ACTIVITY_RESULT=90;
 
-	public static Enumerable<Novel> getNovelListLinq(){
-		return  Linq4j.asEnumerable(Config.BookList);
-	}
+
 	public static String getSearchUrl(String keyword, int pageIndex) {
 		return String.format("%s/search?keyword=%s&pageIndex=%d&type=1&r=%d",
 			Config.ApiHost,
@@ -60,9 +56,6 @@ public class Config {
 		return  tempUrl;
 	}
 	static {
-		List<Novel> list = Novel.listAll(Novel.class,"adddate desc");
-		if (list != null&&list.size()>0) {
-			BookList.addAll(list);
-		}
+
 	}
 }

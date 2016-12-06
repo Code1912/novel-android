@@ -20,6 +20,7 @@ import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 
 import org.apache.calcite.linq4j.Enumerable;
@@ -100,15 +101,15 @@ public class ChapterInfoActivity extends ActivityBase {
 	}
 	private  void btnMenuClick(View v) {
 		Intent newIntent = new Intent(ChapterInfoActivity.this, ChapterListActivity.class);
-		String str = JSON.toJSONString(novel);
-		newIntent.putExtra(Config.NOVEL_INFO, str);
-		str = JSON.toJSONString(chapterList);
-		List<ChapterInfo> tempList=JSON.parseObject(str,new TypeReference<List<ChapterInfo>>(){});
+
+		newIntent.putExtra(Config.NOVEL_INFO, Transporter.instance.putObject(novel));
+
+		List<ChapterInfo> tempList=Util.deepCloneArray(chapterList);
 		for (ChapterInfo info : tempList) {
 			info.content=null;
 		}
-		str = JSON.toJSONString(tempList);
-		newIntent.putExtra(Config.CHAPTER_LIST, str);
+		newIntent.putExtra(Config.CHAPTER_LIST, Transporter.instance.putArray(tempList
+		));
 		newIntent.putExtra(Config.IS_TEMP_READ, isTempRead);
 		newIntent.putExtra(Config.CURRENT_CHAPTER_INDEX, chapterInfo.chapter_index);
 		showToolBar(false);
@@ -141,7 +142,7 @@ public class ChapterInfoActivity extends ActivityBase {
 
 	private  void getChapterList(){
 		if(isTempRead){
-			chapterList=JSON.parseObject(getIntent().getStringExtra(Config.CHAPTER_LIST),new TypeReference<List<ChapterInfo>>(){});
+			chapterList=Transporter.instance.getTransportData(getIntent().getStringExtra(Config.CHAPTER_LIST));
 			return;
 		}
 		chapterList=ChapterInfo.find(ChapterInfo.class,String.format( "novelid=%d and type=%d ",novel.getId(),novel.type),null,"","chapterindex asc","");
@@ -197,7 +198,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		getChapterInfo();
 	}
         private boolean getNovel(){
-		novel=JSON.parseObject(getIntent().getStringExtra(Config.NOVEL_INFO), new TypeReference<Novel>(){});
+		novel=Transporter.instance.getTransportData(getIntent().getStringExtra(Config.NOVEL_INFO));
 		if(novel==null){
 			Util.toast(ChapterInfoActivity.this,"获取小说信息失败");
 			return false;
@@ -208,7 +209,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		if (novel.last_chapter_index < 1) {
 			chapterInfo = chapterList.get(0);
 		} else {
-			chapterInfo = Linq4j.asEnumerable(chapterList).first(p -> p.chapter_index== novel.last_chapter_index);
+			chapterInfo = Linq4j.asEnumerable(chapterList).firstOrDefault(p -> p.chapter_index == novel.last_chapter_index);
 		}
 		if (chapterInfo == null) {
 			Util.toast(ChapterInfoActivity.this, "获取章节信息失败");
@@ -265,10 +266,9 @@ public class ChapterInfoActivity extends ActivityBase {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
 		if(resultCode==Config.CHAPTER_LIST_ACTIVITY_RESULT){
 			 int index=data.getIntExtra(Config.CURRENT_CHAPTER_INDEX,0);
-			 chapterList =JSON.parseArray(data.getStringExtra(Config.CHAPTER_LIST),ChapterInfo.class);
+			 chapterList =Transporter.instance.getTransportData(data.getStringExtra(Config.CHAPTER_LIST));
                          chapterInfo= Linq4j.asEnumerable(chapterList).first(n->n.chapter_index==index);
 			 novel.last_chapter_index=chapterInfo.chapter_index;
 			 getChapterInfo();

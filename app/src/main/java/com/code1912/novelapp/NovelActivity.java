@@ -2,7 +2,6 @@ package com.code1912.novelapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,8 @@ import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.Transporter;
+import com.code1912.novelapp.utils.Util;
 
 import org.apache.calcite.linq4j.Linq4j;
 
@@ -63,20 +64,13 @@ public class NovelActivity extends ActivityBase {
         findViewById(R.id.btn_start_read).setOnClickListener(v->onBtnReadClick(v));
     }
     private  void onBtnAdd(View v){
-        if(Config.getNovelListLinq().any(n->n.name.equals(novel.name)&&n.author_name.equals(novel.author_name))){
+        if(Novel.count(Novel.class,String.format("name='%s' and authorname='%s'",novel.name,novel.author_name),null)>0){
             return;
         }
         Intent intent = new Intent();
-        intent.putExtra(Config.KEY,Config.ADD_NOVEL_KEY);
         intent.setAction(Config.BROADCAST_ADD_NOVEL);
-        Bundle bundle = new Bundle();
-        String str = JSON.toJSONString(novel);
-        bundle.putString(Config.NOVEL_INFO, str);
-
-        String chapterListStr = JSON.toJSONString(allChapterInfoList);
-        bundle.putString(Config.CHAPTER_LIST, chapterListStr);
-
-        intent.putExtras(bundle);
+        intent.putExtra(Config.NOVEL_INFO, Transporter.instance.putObject(novel));
+        intent.putExtra(Config.CHAPTER_LIST, Transporter.instance.putArray(allChapterInfoList));
         sendBroadcast(intent);
         showMsg("加入成功");
     }
@@ -85,7 +79,7 @@ public class NovelActivity extends ActivityBase {
         if(allChapterInfoList.size()==0){
             return;
         }
-        ChapterInfo info=(ChapterInfo)allChapterInfoList.get(0);
+        ChapterInfo info= allChapterInfoList.get(0);
         startReadActivity(info);
     }
     private void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -98,8 +92,8 @@ public class NovelActivity extends ActivityBase {
     private  void startReadActivity(ChapterInfo info){
         Intent intent = new Intent(NovelActivity.this, ChapterInfoActivity.class);
         novel.last_chapter_index=info.chapter_index;
-        intent.putExtra(Config.NOVEL_INFO,JSON.toJSONString(novel));
-        intent.putExtra(Config.CHAPTER_LIST,JSON.toJSONString(allChapterInfoList));
+        intent.putExtra(Config.NOVEL_INFO,Transporter.instance.putObject(novel));
+        intent.putExtra(Config.CHAPTER_LIST,Transporter.instance.putObject(allChapterInfoList));
         intent.putExtra(Config.IS_TEMP_READ,true);
         startActivity(intent);
         this.finish();

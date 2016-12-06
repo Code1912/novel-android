@@ -3,7 +3,6 @@ package com.code1912.novelapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,10 +16,9 @@ import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 import com.code1912.novelapp.viewholder.ChapterListTitleViewHolder;
-
-import org.apache.calcite.linq4j.Linq4j;
 
 import java.util.List;
 
@@ -58,9 +56,9 @@ public class ChapterListActivity extends ActivityBase {
 	private void   getData(){
 		isTempRead=getIntent().getBooleanExtra(Config.IS_TEMP_READ,true);
 		currentChapterIndex=getIntent().getIntExtra(Config.CURRENT_CHAPTER_INDEX,-1);
-		novel= JSON.parseObject(getIntent().getStringExtra(Config.NOVEL_INFO),Novel.class);
+		novel= Transporter.instance.getTransportData(getIntent().getStringExtra(Config.NOVEL_INFO));
 		toolbar.setTitle(novel.name);
-		chapterInfoList=JSON.parseObject(getIntent().getStringExtra(Config.CHAPTER_LIST),new TypeReference<List<ChapterInfo>>(){});
+		chapterInfoList=Transporter.instance.getTransportData(getIntent().getStringExtra(Config.CHAPTER_LIST));
 		int index=0;
 		for (ChapterInfo info : chapterInfoList) {
 			if(info.chapter_index==currentChapterIndex){
@@ -72,7 +70,8 @@ public class ChapterListActivity extends ActivityBase {
 
 		listAdapter.addDataList(chapterInfoList);
 		listView.setOnItemClickListener((v,v1,v2,v3)->onItemClick(v,v1,v2,v3));
-		listView.setSelection(index);
+	         final  int finalIndex=index;
+		listView.post(() -> listView.setSelection(finalIndex));
 		if(isTempRead){
 			refreshView.setVisibility(View.GONE);
 		}
@@ -82,7 +81,10 @@ public class ChapterListActivity extends ActivityBase {
 		ChapterInfo info=(ChapterInfo)listAdapter.getItem(i);
 		Intent intent=new Intent();
                 intent.putExtra(Config.CURRENT_CHAPTER_INDEX,info.chapter_index);
-		intent.putExtra(Config.CHAPTER_LIST,JSON.toJSONString(chapterInfoList));
+		for (ChapterInfo item : chapterInfoList) {
+			item.is_current=false;
+		}
+		intent.putExtra(Config.CHAPTER_LIST, Transporter.instance.putArray(chapterInfoList));
                 this.setResult(Config.CHAPTER_LIST_ACTIVITY_RESULT,intent);
 		this.finish();
 	}

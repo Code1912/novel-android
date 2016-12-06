@@ -19,6 +19,7 @@ import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 import com.code1912.novelapp.viewholder.MainGridItemViewHolder;
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         gridView=(GridView) findViewById(R.id.novel_grid);
         novelListAdapter=new ListAdapter(this, MainGridItemViewHolder.class,R.layout.activity_main_item);
         gridView.setAdapter(novelListAdapter);
-        novelListAdapter.addDataList(Config.BookList);
+        novelListAdapter.addDataList(Novel.listAll(Novel.class));
         novelListAdapter.setOnItemChildClick((v,data,id)->{
             if(id==R.id.icon_trash){
                 int index=novelListAdapter.getList().indexOf(data);
@@ -70,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             hideTrash();
             Novel novel=  (Novel) novelListAdapter.getItem(index) ;
             Intent intent = new Intent(MainActivity.this,ChapterInfoActivity.class);
-            intent.putExtra(Config.NOVEL_INFO,JSON.toJSONString(novel));
+            intent.putExtra(Config.NOVEL_INFO,Transporter.instance.putObject(novel));
             intent.putExtra(Config.IS_TEMP_READ,false);
             startActivity(intent);
         });
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark    );
         swipeRefreshLayout.setOnRefreshListener(()->{
-            if(Config.BookList.size()==0){
+            if(novelListAdapter.getList().size()==0){
                 swipeRefreshLayout.setRefreshing(false);
                 return;
             }
@@ -102,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String key = intent.getStringExtra(Config.KEY);
-
                 if (intent.getAction()==Config.BROADCAST_ADD_NOVEL) {
                     addNovel(intent);
                     return;
@@ -136,19 +135,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private  void addNovel(Intent intent){
-        String str = intent.getExtras().getString(Config.NOVEL_INFO);
-        Novel novel = JSON.parseObject(str, Novel.class);
+        String  dataId = intent.getStringExtra(Config.NOVEL_INFO);
+        Novel novel = Transporter.instance.getTransportData(dataId);
         if (novel == null) {
             return;
         }
         novel.add_date = new Date(System.currentTimeMillis());
-        str=intent.getExtras().getString(Config.CHAPTER_LIST);
-        final List<ChapterInfo> chapterInfoList =JSON.parseObject(str, new TypeReference<List<ChapterInfo>>(){});
+        dataId=intent.getStringExtra(Config.CHAPTER_LIST);
+        final List<ChapterInfo> chapterInfoList =Transporter.instance.getTransportData(dataId);
         novel.read_chapter_count=0;
         novel.all_chapter_count= chapterInfoList.size();
 
         runOnUiThread(() -> {
-            Config.BookList.add(0,novel);
             Long id= Novel.save(novel);
             for (ChapterInfo chapterInfo : chapterInfoList) {
                 chapterInfo.novel_id=id;
