@@ -108,6 +108,13 @@ public class NovelBiz {
 			callBack.onPost(result,false);
 		});
 	}
+
+	public boolean hasExistNovel(String name,String author_name){
+		if(Novel.count(Novel.class,String.format("name='%s' and authorname='%s'",name,author_name),null)>0){
+			return true;
+		}
+		return  false;
+	}
 	public  void getNewChapterList(long novelId,ChapterListCallBack callBack) {
 		Novel novel = Novel.findById(Novel.class,novelId);
 		if (novel == null) {

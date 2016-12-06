@@ -64,7 +64,7 @@ public class NovelActivity extends ActivityBase {
         findViewById(R.id.btn_start_read).setOnClickListener(v->onBtnReadClick(v));
     }
     private  void onBtnAdd(View v){
-        if(Novel.count(Novel.class,String.format("name='%s' and authorname='%s'",novel.name,novel.author_name),null)>0){
+        if(NovelBiz.instance.hasExistNovel(novel.name,novel.author_name)){
             return;
         }
         Intent intent = new Intent();

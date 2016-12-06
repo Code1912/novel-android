@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction()==Config.BROADCAST_ADD_NOVEL) {
+
                     addNovel(intent);
                     return;
                 }
@@ -137,12 +138,17 @@ public class MainActivity extends AppCompatActivity {
     private  void addNovel(Intent intent){
         String  dataId = intent.getStringExtra(Config.NOVEL_INFO);
         Novel novel = Transporter.instance.getTransportData(dataId);
+
+        dataId=intent.getStringExtra(Config.CHAPTER_LIST);
+        final List<ChapterInfo> chapterInfoList =Transporter.instance.getTransportData(dataId);
+
         if (novel == null) {
             return;
         }
+        if(NovelBiz.instance.hasExistNovel(novel.name,novel.author_name)){
+            return;
+        }
         novel.add_date = new Date(System.currentTimeMillis());
-        dataId=intent.getStringExtra(Config.CHAPTER_LIST);
-        final List<ChapterInfo> chapterInfoList =Transporter.instance.getTransportData(dataId);
         novel.read_chapter_count=0;
         novel.all_chapter_count= chapterInfoList.size();
 
