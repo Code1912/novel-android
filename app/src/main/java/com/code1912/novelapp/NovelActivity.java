@@ -93,7 +93,7 @@ public class NovelActivity extends ActivityBase {
         Intent intent = new Intent(NovelActivity.this, ChapterInfoActivity.class);
         novel.last_chapter_index=info.chapter_index;
         intent.putExtra(Config.NOVEL_INFO,Transporter.instance.putObject(novel));
-        intent.putExtra(Config.CHAPTER_LIST,Transporter.instance.putObject(allChapterInfoList));
+        intent.putExtra(Config.CHAPTER_LIST,Transporter.instance.putArray(allChapterInfoList));
         intent.putExtra(Config.IS_TEMP_READ,true);
         startActivity(intent);
         this.finish();
@@ -130,7 +130,9 @@ public class NovelActivity extends ActivityBase {
         SetText(R.id.novel_new_chapter, novel.newestChapter_headline);
         SetText(R.id.novel_description, novel.description);
         SetText(R.id.novel_last_edit_date1, novel.getLastEditDate());
-        Glide.with(this).load(novel.image).into((ImageView) findViewById(R.id.novel_img));
+        ImageView imageView=(ImageView) findViewById(R.id.novel_img);
+        Glide.clear(imageView);
+        Glide.with(this).load(novel.image).into(imageView);
     }
 
     private void SetText(int id, String text) {

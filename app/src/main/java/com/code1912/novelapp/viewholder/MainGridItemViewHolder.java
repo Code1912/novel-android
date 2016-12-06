@@ -55,6 +55,7 @@ public class MainGridItemViewHolder extends  ViewHolderBase<Novel> {
 	}
 	@Override
 	public void setViewInfo(Context context, Novel info) {
+		Glide.clear(this.image);
 		Glide.with(context)
 			.load(info.image)
 			.centerCrop()

@@ -42,23 +42,23 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        gridView=(GridView) findViewById(R.id.novel_grid);
-        novelListAdapter=new ListAdapter(this, MainGridItemViewHolder.class,R.layout.activity_main_item);
+        gridView = (GridView) findViewById(R.id.novel_grid);
+        novelListAdapter = new ListAdapter(this, MainGridItemViewHolder.class, R.layout.activity_main_item);
         gridView.setAdapter(novelListAdapter);
         novelListAdapter.addDataList(Novel.listAll(Novel.class));
-        novelListAdapter.setOnItemChildClick((v,data,id)->{
-            if(id==R.id.icon_trash){
-                int index=novelListAdapter.getList().indexOf(data);
+        novelListAdapter.setOnItemChildClick((v, data, id) -> {
+            if (id == R.id.icon_trash) {
+                int index = novelListAdapter.getList().indexOf(data);
                 novelListAdapter.removeAt(index);
                 data.delete();
-                ChapterInfo.deleteAll(ChapterInfo.class,String.format("novelid=%d",data.getId()));
+                ChapterInfo.deleteAll(ChapterInfo.class, String.format("novelid=%d", data.getId()));
             }
-            if(id==R.id.item_mask){
+            if (id == R.id.item_mask) {
                 hideTrash();
             }
         });
 
-        gridView.setOnItemLongClickListener((v,v1,position,v3)-> {
+        gridView.setOnItemLongClickListener((v, v1, position, v3) -> {
             novelListAdapter.getDataList().foreach(n -> {
                 n.isShowTrash = true;
                 return n;
@@ -67,48 +67,50 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        gridView.setOnItemClickListener((v,v1,index,id)->{
+        gridView.setOnItemClickListener((v, v1, index, id) -> {
             hideTrash();
-            Novel novel=  (Novel) novelListAdapter.getItem(index) ;
-            Intent intent = new Intent(MainActivity.this,ChapterInfoActivity.class);
-            intent.putExtra(Config.NOVEL_INFO,Transporter.instance.putObject(novel));
-            intent.putExtra(Config.IS_TEMP_READ,false);
+            Novel novel = (Novel) novelListAdapter.getItem(index);
+            Intent intent = new Intent(MainActivity.this, ChapterInfoActivity.class);
+            intent.putExtra(Config.NOVEL_INFO, Transporter.instance.putObject(novel));
+            intent.putExtra(Config.IS_TEMP_READ, false);
             startActivity(intent);
         });
 
-        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark    );
-        swipeRefreshLayout.setOnRefreshListener(()->{
-            if(novelListAdapter.getList().size()==0){
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (novelListAdapter.getList().size() == 0) {
                 swipeRefreshLayout.setRefreshing(false);
                 return;
             }
 
-            novelListAdapter.getDataList().foreach(n->{
-                n.refreshed=false;
+            novelListAdapter.getDataList().foreach(n -> {
+                n.refreshed = false;
                 refresh(n);
-                return  n;
+                return n;
             });
         });
         registerBroadcast();
     }
-    private  void hideTrash(){
+
+    private void hideTrash() {
         novelListAdapter.getDataList().foreach(n -> {
             n.isShowTrash = false;
             return n;
         });
         novelListAdapter.notifyDataSetChanged();
     }
-    private  void registerBroadcast() {
+
+    private void registerBroadcast() {
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (intent.getAction()==Config.BROADCAST_ADD_NOVEL) {
+                if (intent.getAction() == Config.BROADCAST_ADD_NOVEL) {
 
                     addNovel(intent);
                     return;
                 }
-                if (intent.getAction()==Config.BROADCAST_NOTIFY_NOVEL) {
+                if (intent.getAction() == Config.BROADCAST_NOTIFY_NOVEL) {
                     notifyReadCountChanged(intent);
                     return;
                 }
@@ -119,88 +121,91 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(Config.BROADCAST_NOTIFY_NOVEL);
         registerReceiver(mBroadcastReceiver, intentFilter);
     }
-    private  void notifyReadCountChanged(Intent intent){
+
+    private void notifyReadCountChanged(Intent intent) {
         String str = intent.getExtras().getString(Config.NOVEL_INFO);
         Novel novel = JSON.parseObject(str, Novel.class);
         if (novel == null) {
             return;
         }
-        Novel item= novelListAdapter.getDataList().first(n->n.getId()==novel.getId());
-        if(item==null){
+        Novel item = novelListAdapter.getDataList().first(n -> n.getId() == novel.getId());
+        if (item == null) {
             return;
         }
-        item.last_chapter_index=novel.last_chapter_index;
-        item.read_chapter_count=novel.read_chapter_count;
-        runOnUiThread(()->{
+        item.last_chapter_index = novel.last_chapter_index;
+        item.read_chapter_count = novel.read_chapter_count;
+        runOnUiThread(() -> {
             novelListAdapter.notifyDataSetChanged();
         });
     }
-    private  void addNovel(Intent intent){
-        String  dataId = intent.getStringExtra(Config.NOVEL_INFO);
+
+    private void addNovel(Intent intent) {
+        String dataId = intent.getStringExtra(Config.NOVEL_INFO);
         Novel novel = Transporter.instance.getTransportData(dataId);
 
-        dataId=intent.getStringExtra(Config.CHAPTER_LIST);
-        final List<ChapterInfo> chapterInfoList =Transporter.instance.getTransportData(dataId);
+        dataId = intent.getStringExtra(Config.CHAPTER_LIST);
+        final List<ChapterInfo> chapterInfoList = Transporter.instance.getTransportData(dataId);
 
         if (novel == null) {
             return;
         }
-        if(NovelBiz.instance.hasExistNovel(novel.name,novel.author_name)){
+        if (NovelBiz.instance.hasExistNovel(novel.name, novel.author_name)) {
             return;
         }
         novel.add_date = new Date(System.currentTimeMillis());
-        novel.read_chapter_count=0;
-        novel.all_chapter_count= chapterInfoList.size();
+        novel.read_chapter_count = 0;
+        novel.all_chapter_count = chapterInfoList.size();
 
         runOnUiThread(() -> {
-            Long id= Novel.save(novel);
+            Long id = Novel.save(novel);
             for (ChapterInfo chapterInfo : chapterInfoList) {
-                chapterInfo.novel_id=id;
-                chapterInfo.add_date= Util.getCurrentDate();
+                chapterInfo.novel_id = id;
+                chapterInfo.add_date = Util.getCurrentDate();
             }
-            novelListAdapter.addData(0,novel);
+            novelListAdapter.addData(0, novel);
             ChapterInfo.saveInTx(chapterInfoList);
         });
     }
 
-    private  void refresh(Novel novel){
-        NovelBiz.instance.getChapterList(novel.current_url,(list,isSuccess)->{
-             if(!isSuccess){
-                 novel.save();
-                 novel.refreshed=true;
-                 refreshUI();
-                 return;
-             }
-            novel.is_have_new=list.size()>novel.all_chapter_count;
-            if(novel.is_have_new){
+    private void refresh(Novel novel) {
+        NovelBiz.instance.getChapterList(novel.current_url, (list, isSuccess) -> {
+            if (!isSuccess) {
+                novel.save();
+                novel.refreshed = true;
+                refreshUI();
+                return;
+            }
+            novel.is_have_new = list.size() > novel.all_chapter_count;
+            if (novel.is_have_new) {
                 for (ChapterInfo chapterInfo : list) {
-                    List<ChapterInfo> titles=  ChapterInfo.find(ChapterInfo.class," novelid=? and chapter_index=?",new String[]{String.valueOf(novel.getId()), String.valueOf(chapterInfo.chapter_index)});
-                    if(titles!=null||titles.size()>0){
+                    List<ChapterInfo> titles = ChapterInfo.find(ChapterInfo.class, " novelid=? and chapter_index=?", new String[]{String.valueOf(novel.getId()), String.valueOf(chapterInfo.chapter_index)});
+                    if (titles != null || titles.size() > 0) {
                         continue;
                     }
-                    chapterInfo.novel_id= novel.getId();
-                    chapterInfo.add_date= Util.getCurrentDate();
+                    chapterInfo.novel_id = novel.getId();
+                    chapterInfo.add_date = Util.getCurrentDate();
                     ChapterInfo.save(chapterInfo);
                 }
             }
-            novel.refreshed=true;
-            novel.all_chapter_count=list.size();
+            novel.refreshed = true;
+            novel.all_chapter_count = list.size();
             novel.save();
-            novel.refreshed=true;
+            novel.refreshed = true;
             refreshUI();
         });
     }
 
-    private  void refreshUI(){
-        if( !novelListAdapter.getDataList().all(p->p.refreshed)) {
+    private void refreshUI() {
+        if (!novelListAdapter.getDataList().all(p -> p.refreshed)) {
             return;
         }
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
             novelListAdapter.notifyDataSetChanged();
             swipeRefreshLayout.setRefreshing(false);
-         //   Novel.saveInTx(novelListAdapter.getDataList().toList());
+            //   Novel.saveInTx(novelListAdapter.getDataList().toList());
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.main_search) {
             hideTrash();
-            Intent intent = new Intent(MainActivity.this,SearchActivity.class);
+            Intent intent = new Intent(MainActivity.this, SearchActivity.class);
             startActivity(intent);
             return true;
         }

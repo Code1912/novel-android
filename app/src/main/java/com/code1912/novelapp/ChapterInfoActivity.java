@@ -145,7 +145,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			chapterList=Transporter.instance.getTransportData(getIntent().getStringExtra(Config.CHAPTER_LIST));
 			return;
 		}
-		chapterList=ChapterInfo.find(ChapterInfo.class,String.format( "novelid=%d and type=%d ",novel.getId(),novel.type),null,"","chapterindex asc","");
+		chapterList=NovelBiz.instance.getChapterListWithOutContentByNovelId(novel.getId(),novel.type);
 		chapterList=Linq4j.asEnumerable(chapterList).orderBy(p->p.getId()).toList();
 	}
 
@@ -209,11 +209,16 @@ public class ChapterInfoActivity extends ActivityBase {
 		if (novel.last_chapter_index < 1) {
 			chapterInfo = chapterList.get(0);
 		} else {
-			chapterInfo = Linq4j.asEnumerable(chapterList).firstOrDefault(p -> p.chapter_index == novel.last_chapter_index);
+			chapterInfo = Linq4j.asEnumerable(chapterList).firstOrDefault(p -> {
+				return  p.chapter_index == novel.last_chapter_index;
+			});
 		}
 		if (chapterInfo == null) {
 			Util.toast(ChapterInfoActivity.this, "获取章节信息失败");
 			return;
+		}
+		if(chapterInfo.getId()!=null&&chapterInfo.getId()>0&&Util.isNullOrEmpty(chapterInfo.content)){
+			chapterInfo.content=NovelBiz.instance.getContentById(chapterInfo.getId());
 		}
 		if (!Util.isNullOrEmpty(chapterInfo.content)) {
 			updateChapterInfo();

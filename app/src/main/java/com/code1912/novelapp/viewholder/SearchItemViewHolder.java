@@ -36,6 +36,7 @@ public   class SearchItemViewHolder extends ViewHolderBase<Novel> {
     public  TextView txtType;
     public  TextView txtLastEditDate;
     public  void setViewInfo(Context context, Novel novel){
+        Glide.clear(image);
         Glide.with(context).load(novel.image).into(this.image);
         this.txtTitle.setText(novel.name);
         this.txtDescription.setText(novel.description);

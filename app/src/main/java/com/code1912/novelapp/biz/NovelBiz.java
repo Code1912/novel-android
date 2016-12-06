@@ -60,7 +60,7 @@ public class NovelBiz {
 				 String str = response.body().string();
 				 CommonResponse<Novel> result = JSON.parseObject(str, new TypeReference<CommonResponse<Novel>>() {
 				 });
-				 if (result == null ) {
+				 if (result == null ||result.resultList==null) {
 					 callBack.onPost(null, false);
 					 return;
 				 }
@@ -109,6 +109,20 @@ public class NovelBiz {
 		});
 	}
 
+	public List<ChapterInfo> getChapterListWithOutContentByNovelId(long novelId,int type){
+		//ChapterInfo.executeQuery("VACUUM");
+	    List<ChapterInfo>  list= 	ChapterInfo.findWithQuery(ChapterInfo.class,
+		    String.format( "select id, title,url,novelId,addDate,isReaded,position,chapterIndex,isDownloaded,'' as content from  Chapter_Info where novelId=%d and type=%d order by  chapterIndex asc ",novelId,type));
+
+	     return  list;
+	}
+	public  ChapterInfo  getChapterById(long chapterId){
+		return      ChapterInfo.findById(ChapterInfo.class,chapterId);
+	}
+	public  String  getContentById(long chapterId){
+                ChapterInfo chapterInfo=getChapterById(chapterId);
+		return  chapterInfo!=null?chapterInfo.content:"";
+	}
 	public boolean hasExistNovel(String name,String author_name){
 		if(Novel.count(Novel.class,String.format("name='%s' and authorname='%s'",name,author_name),null)>0){
 			return true;

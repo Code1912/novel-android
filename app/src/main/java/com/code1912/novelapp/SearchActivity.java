@@ -39,6 +39,7 @@ public class SearchActivity extends ActivityBase implements   SearchView.OnQuery
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("");
         //display white color back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> SearchActivity.this.finish());
@@ -106,7 +107,7 @@ public class SearchActivity extends ActivityBase implements   SearchView.OnQuery
             this.showLoading(false);
             SearchActivity.this.setRefreshing(false);
             SearchActivity.this.result=result;
-            if(result.resultList==null){
+            if(!isSuccess){
                 return;
             }
             runOnUiThread(()->{

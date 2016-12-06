@@ -34,6 +34,7 @@ public class LoadingView extends LinearLayout {
 		LayoutInflater.from(context).inflate(R.layout.view_loading, this);
 		imageView = (ImageView) findViewById(R.id.loading_img);
 		if (context != null) {
+			Glide.clear(this.imageView);
 			Glide.with(context)
 				.load(R.drawable.loading).asGif().into(this.imageView);
 
