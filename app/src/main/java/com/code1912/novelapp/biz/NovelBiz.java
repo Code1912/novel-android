@@ -100,10 +100,12 @@ public class NovelBiz {
 				callBack.onPost(null,false);
 				return;
 			}
-			info.content=result.content;
-			info.is_downloaded=true;
+
 			if(isNeedSave&&!Util.isNullOrEmpty(result.content)){
+				info.content=result.content;
+				info.is_downloaded=true;
 				info.save();
+				info.content="";
 			}
 			callBack.onPost(result,false);
 		});
@@ -112,7 +114,7 @@ public class NovelBiz {
 	public List<ChapterInfo> getChapterListWithOutContentByNovelId(long novelId,int type){
 		//ChapterInfo.executeQuery("VACUUM");
 	    List<ChapterInfo>  list= 	ChapterInfo.findWithQuery(ChapterInfo.class,
-		    String.format( "select id, title,url,novelId,addDate,isReaded,position,chapterIndex,isDownloaded,'' as content from  Chapter_Info where novelId=%d and type=%d order by  chapterIndex asc ",novelId,type));
+		    String.format( "select id, title,url,novelId,addDate,isReaded,position,chapterIndex,isDownloaded,'' as content,type from  Chapter_Info where novelId=%d and type=%d order by  chapterIndex asc ",novelId,type));
 
 	     return  list;
 	}

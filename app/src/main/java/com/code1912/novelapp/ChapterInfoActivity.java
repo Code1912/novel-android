@@ -3,27 +3,24 @@ package com.code1912.novelapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.code1912.novelapp.biz.NovelBiz;
 import com.code1912.novelapp.model.ChapterInfo;
-import com.code1912.novelapp.model.CommonResponse;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.PageSplitter;
 import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 
-import org.apache.calcite.linq4j.Enumerable;
 import org.apache.calcite.linq4j.Linq4j;
 
 import java.util.List;
@@ -33,9 +30,10 @@ import java.util.List;
  */
 
 public class ChapterInfoActivity extends ActivityBase {
-
-	ScrollView scrollView;
-       TextView txtContent;
+	List<CharSequence> pages;
+	public  int pageIndex=0;
+	//ScrollView scrollView;
+	TextView txtContent;
 	TextView txtTitle;
 	ChapterInfo chapterInfo;
 	Novel novel;
@@ -46,11 +44,12 @@ public class ChapterInfoActivity extends ActivityBase {
 	int positionY;
 	boolean isTempRead=false;
 	boolean isDownloadingAll=false;
+
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chapter_info);
-		scrollView = (ScrollView) findViewById(R.id.novel_scrollView);
+		//scrollView = (ScrollView) findViewById(R.id.novel_scrollView);
 		txtContent =(TextView)findViewById(R.id.chapter_content);
 		txtTitle =(TextView)findViewById(R.id.novel_title);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -62,42 +61,41 @@ public class ChapterInfoActivity extends ActivityBase {
 		toolbar.setNavigationOnClickListener(v -> ChapterInfoActivity.this.finish());
 
 		footer=(TableLayout) findViewById(R.id.chapter_footer);
-		//scrollView.setOnTouchListener((v,m)->true);
-		scrollView.setOnTouchListener((view, motionEvent) -> {
-			if(motionEvent.getAction()!= MotionEvent.ACTION_UP){
-				return  true ;
-			}
-		        int scrollHeight=scrollView.getMeasuredHeight();
-			int centerHeight=scrollHeight/5;
-			int y = (int) motionEvent.getY();
-			//to up
-			if(y<(scrollHeight-centerHeight)/2){
-				scrollContent(true);
-			}
-			//to down
-			else if(y>(scrollHeight+centerHeight)/2){
-				scrollContent(false);
-			}
-			else {
-				showToolBar(!isShowToolBar);
-			}
-			Log.i("Touch-------------:","");
-			return  true;
-		});
-              /*  txtContent.setOnClickListener(view->{
+		txtContent.setOnTouchListener( (v,e)->onTextTouch(v,e));
 
-			Log.i("Scroll---------",String.valueOf(scrollView.getMeasuredHeight()));
-			Log.i("Text---------",String.valueOf(txtContent.getMeasuredHeight()));
-			Log.i("Posit---------",String.valueOf(scrollView.getScrollY()));
-
-		  //  scrollView.get
-		});*/
 		isTempRead=getIntent().getBooleanExtra(Config.IS_TEMP_READ,true);
 		if(!getNovel()){
 			return;
 		}
 		getChapterList();
 		getChapterInfo();
+	}
+	private  boolean isClicked=false;
+	public boolean onTextTouch(View view, MotionEvent motionEvent) {
+		if(isClicked)
+		{
+			return  true;
+		}
+		if(motionEvent.getAction()!= MotionEvent.ACTION_UP){
+			return  true ;
+		}
+		isClicked=true;
+		int scrollHeight=txtContent.getMeasuredHeight();
+		int centerHeight=scrollHeight/5;
+		int y = (int) motionEvent.getY();
+		//to up
+		if(y<(scrollHeight-centerHeight)/2){
+			toPageText(true);
+		}
+		//to down
+		else if(y>(scrollHeight+centerHeight)/2){
+			toPageText(false);
+		}
+		else {
+			showToolBar(!isShowToolBar);
+		}
+		isClicked=false;
+		return  true;
 	}
 	private  void btnMenuClick(View v) {
 		Intent newIntent = new Intent(ChapterInfoActivity.this, ChapterListActivity.class);
@@ -118,6 +116,9 @@ public class ChapterInfoActivity extends ActivityBase {
 	}
 
 	private  void btnDownloadClick(View v){
+		if(isTempRead){
+			return;
+		}
 		if(Linq4j.asEnumerable(chapterList).all(n->n.is_downloaded)){
 			showMsg("已经全部下载完成了");
 			return;
@@ -133,6 +134,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			if(info.is_downloaded){
 				continue;
 			}
+
 			NovelBiz.instance.getChapterInfo(info,!isTempRead,(res,v1)->{
 
 			});
@@ -155,29 +157,26 @@ public class ChapterInfoActivity extends ActivityBase {
 		toolbar.setVisibility(visibility);
 		footer.setVisibility(visibility);
 	}
-	private void  scrollContent(boolean isToUp){
-		int scrollViewHeight=scrollView.getMeasuredHeight();
-		int contentHeight=txtContent.getMeasuredHeight();
-
-		if(isToUp){
-			scrollViewHeight=-scrollViewHeight;
-		}
-		int currentY=scrollView.getScrollY();
-		int moveY=currentY+scrollViewHeight;
-		if(moveY<0){
-			moveY=0;
-			toNext(-1);
-		}
-		if(contentHeight<=moveY){
-			moveY=contentHeight-scrollViewHeight;
-			toNext(1);
+	private void toPageText(boolean isToUp){
+                if(isToUp) {
+			if (pageIndex == 0) {
+				toNext(-1);
+				return;
+			}
+			pageIndex--;
+			txtContent.setText(pages.get(pageIndex));
 			return;
 		}
-		chapterInfo.position=moveY;
-		if(!isTempRead) {
-			ChapterInfo.save(chapterInfo);
+		else {
+			if(pageIndex==(pages.size()-1)){
+				toNext(1);
+				return;
+			}
+			pageIndex++;
+			txtContent.setText(pages.get(pageIndex));
 		}
-		scrollView.scrollTo(0,moveY);
+
+		//txtContent.scrollTo(0,moveY);
 	}
 	private  void toNext(int i) {
 
@@ -206,6 +205,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		return  true;
 	}
 	private  void getChapterInfo() {
+		this.showLoading(true);
 		if (novel.last_chapter_index < 1) {
 			chapterInfo = chapterList.get(0);
 		} else {
@@ -215,6 +215,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		}
 		if (chapterInfo == null) {
 			Util.toast(ChapterInfoActivity.this, "获取章节信息失败");
+			this.showLoading(false);
 			return;
 		}
 		if(chapterInfo.getId()!=null&&chapterInfo.getId()>0&&Util.isNullOrEmpty(chapterInfo.content)){
@@ -223,9 +224,11 @@ public class ChapterInfoActivity extends ActivityBase {
 		if (!Util.isNullOrEmpty(chapterInfo.content)) {
 			updateChapterInfo();
 			refreshUI();
+			this.showLoading(false);
 			return;
 		}
 		NovelBiz.instance.getChapterInfo(chapterInfo.url, (info, isSuccess) -> {
+			this.showLoading(false);
 			if (!isSuccess) {
 				showMsg("获取信息失败");
 				return;
@@ -249,15 +252,31 @@ public class ChapterInfoActivity extends ActivityBase {
 		notifyReadCountChanged();
 	}
 
-	private  void refreshUI(){
-		runOnUiThread(()->{
-			String content=Util.isNullOrEmpty(chapterInfo.content)?"":chapterInfo.content;
+	private  void refreshUI() {
+		runOnUiThread(() -> {
+			String content = Util.isNullOrEmpty(chapterInfo.content) ? "" : chapterInfo.content;
 			txtTitle.setText(Html.fromHtml(chapterInfo.title));
-			txtContent.setText (content.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"));
-			scrollView.scrollTo(0,chapterInfo.position);
+			txtContent.post(()->{
+				getPages(content);
+				if (pages != null && pages.size() > 0) {
+					txtContent.setText(pages.get(0));
+				}
+			});
+
+			//txtContent.setText (content.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t"));
+			//scrollView.scrollTo(0,chapterInfo.position);
 		});
 	}
-
+        private  void getPages(String str){
+		Log.i("Chapter",str);
+		//str=str.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t");
+		pageIndex=0;
+		TextPaint textPaint = new TextPaint();
+		textPaint.setTextSize(16);
+		PageSplitter	pageSplitter = new PageSplitter(txtContent.getWidth(), txtContent.getHeight(), 1, 0);
+		pageSplitter.append(str,textPaint);
+		pages=  pageSplitter.getPages();
+	}
 	private  void notifyReadCountChanged(){
 		Intent intent = new Intent();
 		intent.putExtra(Config.KEY,Config.NOTIFY_NOVEL_KEY);
