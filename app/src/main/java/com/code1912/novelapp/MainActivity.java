@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             novel.is_have_new = list.size() > novel.all_chapter_count;
             if (novel.is_have_new) {
                 for (ChapterInfo chapterInfo : list) {
-                    List<ChapterInfo> titles = ChapterInfo.find(ChapterInfo.class, " novelid=? and chapterindex=?", new String[]{String.valueOf(novel.getId()), String.valueOf(chapterInfo.chapter_index)});
+                    List<ChapterInfo> titles = ChapterInfo.find(ChapterInfo.class, String.format(" novelid=%d and chapterindex=%d and type=%d",novel.getId(),chapterInfo.chapter_index,novel.type));
                     if (titles != null || titles.size() > 0) {
                         continue;
                     }

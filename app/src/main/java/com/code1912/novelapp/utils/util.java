@@ -3,6 +3,7 @@ package com.code1912.novelapp.utils;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
@@ -76,5 +77,14 @@ public class Util {
 	public static int px2dip(Context context, float pxValue) {
 		final float scale = context.getResources().getDisplayMetrics().density;
 		return (int) (pxValue / scale + 0.5f);
+	}
+
+	public static  int getDeviceWidth(Context context){
+		WindowManager wm = (WindowManager) context
+			.getSystemService(Context.WINDOW_SERVICE);
+
+
+		int height = wm.getDefaultDisplay().getHeight();
+		return  height;
 	}
 }

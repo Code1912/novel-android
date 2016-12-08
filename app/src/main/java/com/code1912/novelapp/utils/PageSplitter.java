@@ -1,5 +1,7 @@
 package com.code1912.novelapp.utils;
 
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.text.SpannableStringBuilder;
 import android.graphics.Typeface;
 import android.text.SpannableString;
@@ -16,7 +18,7 @@ import java.util.List;
 public class PageSplitter {
 	private final int pageWidth;
 	private final int pageHeight;
-	private final float lineSpacingMultiplier;
+
 	private final int lineSpacingExtra;
 	private final List<CharSequence> pages = new ArrayList<CharSequence>();
 	private SpannableStringBuilder currentLine = new SpannableStringBuilder();
@@ -26,10 +28,10 @@ public class PageSplitter {
 	private int currentLineWidth;
 	private int textLineHeight;
 
-	public PageSplitter(int pageWidth, int pageHeight, float lineSpacingMultiplier, int lineSpacingExtra) {
+
+	public PageSplitter(int pageWidth, int pageHeight , int lineSpacingExtra) {
 		this.pageWidth = pageWidth;
 		this.pageHeight = pageHeight;
-		this.lineSpacingMultiplier = lineSpacingMultiplier;
 		this.lineSpacingExtra = lineSpacingExtra;
 	}
 
@@ -38,8 +40,13 @@ public class PageSplitter {
 		currentPage.clear();
 		pages.clear();
 	}
+
 	public void append(String text, TextPaint textPaint) {
-		textLineHeight = (int) Math.ceil(textPaint.getFontMetrics(null) * lineSpacingMultiplier + lineSpacingExtra);
+		float x=textPaint.getFontMetrics(null);
+		textPaint.getFontSpacing();
+		int n=getFontHeight1(textPaint);
+		int n1=getFontHeight(textPaint);
+		textLineHeight = (int) Math.ceil(x + lineSpacingExtra);
 		String[] paragraphs = text.split("\n", -1);
 		int i;
 		for (i = 0; i < paragraphs.length - 1; i++) {
@@ -47,6 +54,18 @@ public class PageSplitter {
 			appendNewLine();
 		}
 		appendText(paragraphs[i], textPaint);
+	}
+	public int getFontHeight1(Paint paint)
+	{
+		Paint.FontMetrics fm = paint.getFontMetrics();
+		return (int) Math.ceil(fm.descent - fm.top) + 2;
+	}
+	public int getFontHeight(TextPaint textPaint){
+
+		Rect r = new Rect();
+		char[] txt = "\n".toCharArray();
+		 textPaint.getTextBounds(txt, 0, 2, r);
+		return  r.height();
 	}
 
 	private void appendText(String text, TextPaint textPaint) {
@@ -73,7 +92,8 @@ public class PageSplitter {
 	}
 
 	private void appendWord(String appendedText, TextPaint textPaint) {
-		int textWidth = (int) Math.ceil(textPaint.measureText(appendedText));
+		Rect rect = new Rect();
+		int textWidth =getWordWidth(appendedText,textPaint);
 		if (currentLineWidth + textWidth >= pageWidth) {
 			checkForPageEnd();
 			appendLineToPage(textLineHeight);
@@ -81,6 +101,12 @@ public class PageSplitter {
 		appendTextToLine(appendedText, textPaint, textWidth);
 	}
 
+	private  int getWordWidth(String str, TextPaint textPaint){
+		Rect rect = new Rect();
+		textPaint.getTextBounds(str,0,str.length(), rect);
+		int width = rect.width ();
+		return width;
+	}
 	private void appendLineToPage(int textLineHeight) {
 		currentPage.append(currentLine);
 		pageContentHeight += currentLineHeight;

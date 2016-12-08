@@ -1,25 +1,40 @@
 package com.code1912.novelapp.extend;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.text.Layout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
+import com.code1912.novelapp.utils.Util;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Code1912 on 2016/12/6.
  */
 
-public class ReadView extends TextView {
+public class ReadView extends View {
 
-	CharBuffer buffer = CharBuffer.allocate(20000);
-	int position;
+
+	TextPaint textPaint=new TextPaint();
+	List<String> text= new ArrayList<>();
+
+	 float y=0;
+	Paint clearPaint=new Paint();
 	public ReadView(Context context) {
 		super(context);
+
 	}
 
 	public ReadView(Context context, AttributeSet attrs) {
@@ -29,68 +44,42 @@ public class ReadView extends TextView {
 	public ReadView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 	}
+
+
 	@Override
-	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-		resize();
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+		if(text==null||text.size()==0){
+			return;
+		} textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		//canvas.drawPaint(clearPaint);
+		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+		y=57;
+		float lineHeight=0;
+		for (String s : text) {
+
+			canvas.drawText(s, 0, y, textPaint);
+			  lineHeight=getLineHeight(s);
+			y+=lineHeight;
+		}
+		int he=this.getHeight();
+	}
+	public int getLineHeight(String word){
+		return  (int)Math.ceil(  textPaint.getFontMetrics(null)  )+20;
 	}
 
-	/**
-	 * 去除当前页无法显示的字
-	 * @return 去掉的字数
-	 */
-	public int resize() {
-		CharSequence oldContent = getText();
-		CharSequence newContent = oldContent.subSequence(0, getCharNum());
-		setText(newContent);
-		return oldContent.length() - newContent.length();
+	public float getLineHeight1(String word)
+	{
+		Paint.FontMetrics fm = textPaint.getFontMetrics();
+		return   (float) (Math.ceil(fm.descent - fm.ascent) + 2+10) ;
 	}
+	public  void setText(List<String> text, TextPaint textPaint){
+		y=0;
+		this.textPaint=textPaint;
+		this.text=text;
 
-	/**
-	 * 获取当前页总字数
-	 */
-	public int getCharNum() {
-		return getLayout().getLineEnd(getLineNum());
+		invalidate();
 	}
-
-	/**
-	 * 获取当前页总行数
-	 */
-	public int getLineNum() {
-		Layout layout = getLayout();
-		int topOfLastLine = getHeight() - getPaddingTop() - getPaddingBottom() - getLineHeight();
-		return layout.getLineForVertical(topOfLastLine);
-	}
-
-	public void loadText(String str) {
-		position=0;
-		buffer.clear();
-		buffer.wrap(str);
-	}
-
-	/**
-	 * 从指定位置开始载入一页
-	 */
-	private void loadPage(int position) {
-		buffer.position(position);
-		this.setText(buffer);
-	}
-
-	/**
-	 * 上一页按钮
-	 */
-	public void previewPageBtn(View view) {
-
-	}
-
-	/**
-	 * 下一页按钮
-	 */
-	public void nextPageBtn(View view) {
-		position += this.getCharNum();
-		loadPage(position);
-		this.resize();
-	}
-
 
 }

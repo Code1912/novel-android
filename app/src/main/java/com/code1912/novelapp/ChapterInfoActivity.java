@@ -14,9 +14,11 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.code1912.novelapp.biz.NovelBiz;
+import com.code1912.novelapp.extend.ReadView;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.PageSplit;
 import com.code1912.novelapp.utils.PageSplitter;
 import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
@@ -30,11 +32,13 @@ import java.util.List;
  */
 
 public class ChapterInfoActivity extends ActivityBase {
-	List<CharSequence> pages;
+	List<String> pages;
+	List<List<String>>  pagesLine;
 	public  int pageIndex=0;
 	//ScrollView scrollView;
 	TextView txtContent;
 	TextView txtTitle;
+	ReadView txtVIew;
 	ChapterInfo chapterInfo;
 	Novel novel;
 	Toolbar toolbar;
@@ -44,14 +48,16 @@ public class ChapterInfoActivity extends ActivityBase {
 	int positionY;
 	boolean isTempRead=false;
 	boolean isDownloadingAll=false;
-
+        TextPaint textPaint=new TextPaint();
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		textPaint.setTextSize(40);
 		setContentView(R.layout.activity_chapter_info);
 		//scrollView = (ScrollView) findViewById(R.id.novel_scrollView);
 		txtContent =(TextView)findViewById(R.id.chapter_content);
 		txtTitle =(TextView)findViewById(R.id.novel_title);
+		txtVIew =(ReadView) findViewById(R.id.txt_view);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		findViewById(R.id.btn_menu).setOnClickListener(v->this.btnMenuClick(v));
 		findViewById(R.id.btn_download).setOnClickListener(v->this.btnDownloadClick(v));
@@ -61,7 +67,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		toolbar.setNavigationOnClickListener(v -> ChapterInfoActivity.this.finish());
 
 		footer=(TableLayout) findViewById(R.id.chapter_footer);
-		txtContent.setOnTouchListener( (v,e)->onTextTouch(v,e));
+		txtVIew.setOnTouchListener( (v,e)->onTextTouch(v,e));
 
 		isTempRead=getIntent().getBooleanExtra(Config.IS_TEMP_READ,true);
 		if(!getNovel()){
@@ -69,6 +75,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		}
 		getChapterList();
 		getChapterInfo();
+
 	}
 	private  boolean isClicked=false;
 	public boolean onTextTouch(View view, MotionEvent motionEvent) {
@@ -80,7 +87,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			return  true ;
 		}
 		isClicked=true;
-		int scrollHeight=txtContent.getMeasuredHeight();
+		int scrollHeight=txtVIew.getMeasuredHeight();
 		int centerHeight=scrollHeight/5;
 		int y = (int) motionEvent.getY();
 		//to up
@@ -164,7 +171,8 @@ public class ChapterInfoActivity extends ActivityBase {
 				return;
 			}
 			pageIndex--;
-			txtContent.setText(pages.get(pageIndex));
+			//txtContent.setText(pages.get(pageIndex));
+			txtVIew.setText(  pagesLine.get(pageIndex) ,textPaint );
 			return;
 		}
 		else {
@@ -173,7 +181,8 @@ public class ChapterInfoActivity extends ActivityBase {
 				return;
 			}
 			pageIndex++;
-			txtContent.setText(pages.get(pageIndex));
+			//txtContent.setText(pages.get(pageIndex));
+			txtVIew.setText(  pagesLine.get(pageIndex) ,textPaint );
 		}
 
 		//txtContent.scrollTo(0,moveY);
@@ -256,10 +265,12 @@ public class ChapterInfoActivity extends ActivityBase {
 		runOnUiThread(() -> {
 			String content = Util.isNullOrEmpty(chapterInfo.content) ? "" : chapterInfo.content;
 			txtTitle.setText(Html.fromHtml(chapterInfo.title));
-			txtContent.post(()->{
+			txtVIew.post(()->{
 				getPages(content);
+
 				if (pages != null && pages.size() > 0) {
-					txtContent.setText(pages.get(0));
+					//txtContent.setText(pages.get(0));
+					txtVIew.setText(pagesLine.get(0),textPaint);
 				}
 			});
 
@@ -271,11 +282,12 @@ public class ChapterInfoActivity extends ActivityBase {
 		Log.i("Chapter",str);
 		//str=str.replace("\\n","\n").replace("\\r","\r").replace("\\t","\t");
 		pageIndex=0;
-		TextPaint textPaint = new TextPaint();
-		textPaint.setTextSize(16);
-		PageSplitter	pageSplitter = new PageSplitter(txtContent.getWidth(), txtContent.getHeight(), 1, 0);
-		pageSplitter.append(str,textPaint);
-		pages=  pageSplitter.getPages();
+
+                int a=Util.getDeviceWidth(ChapterInfoActivity.this);
+		PageSplit pageSplitter = new PageSplit(txtVIew.getWidth(), txtVIew.getHeight() ,5);
+		pageSplitter.appendText(str,textPaint);
+		pages=  pageSplitter.getPageList();
+		pagesLine=pageSplitter.pageLineList;
 	}
 	private  void notifyReadCountChanged(){
 		Intent intent = new Intent();
