@@ -17,7 +17,7 @@ import java.util.Random;
  */
 
 public class Config {
-	public static String ApiHost = "http://www.code1912.cn:3000";
+	public static String ApiHost = "http://127.0.0.1:3000";
 	public static final String TRANSPORT_KEY = "TRANSPORT_KEY";
 	public static final String NOVEL_INFO = "NOVEL_INFO";
 	public static final String CHAPTER_LIST = "CHAPTER_LIST";
