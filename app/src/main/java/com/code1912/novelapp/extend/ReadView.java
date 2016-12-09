@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,12 +30,11 @@ public class ReadView extends View {
 
 	TextPaint textPaint=new TextPaint();
 	List<String> text= new ArrayList<>();
+	int lineHeight=0;
+	float y=0;
 
-	 float y=0;
-	Paint clearPaint=new Paint();
 	public ReadView(Context context) {
 		super(context);
-
 	}
 
 	public ReadView(Context context, AttributeSet attrs) {
@@ -45,40 +45,33 @@ public class ReadView extends View {
 		super(context, attrs, defStyleAttr);
 	}
 
-
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		if(text==null||text.size()==0){
 			return;
-		} textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-		//canvas.drawPaint(clearPaint);
-		//clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-		y=57;
-		float lineHeight=0;
-		for (String s : text) {
-
-			canvas.drawText(s, 0, y, textPaint);
-			  lineHeight=getLineHeight(s);
-			y+=lineHeight;
 		}
-		int he=this.getHeight();
+		Log.i("fffff---",String.valueOf( this.getHeight()));
+                y=50;
+		for (String s : text) {
+			canvas.drawText(s, 0, y, textPaint);
+			lineHeight = getLineHeight(s);
+			y += lineHeight;
+		}
 	}
 	public int getLineHeight(String word){
 		return  (int)Math.ceil(  textPaint.getFontMetrics(null)  )+20;
 	}
 
-	public float getLineHeight1(String word)
-	{
-		Paint.FontMetrics fm = textPaint.getFontMetrics();
-		return   (float) (Math.ceil(fm.descent - fm.ascent) + 2+10) ;
-	}
-	public  void setText(List<String> text, TextPaint textPaint){
+
+
+
+	public    void setText(List<String> text, TextPaint textPaint,int lineHeight){
 		y=0;
 		this.textPaint=textPaint;
 		this.text=text;
-
+		this.lineHeight=lineHeight;
+		textPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 		invalidate();
 	}
 

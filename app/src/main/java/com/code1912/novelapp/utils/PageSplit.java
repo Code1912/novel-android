@@ -31,7 +31,7 @@ public class PageSplit {
 		convertToPages();
 	}
 	public  void appendText(String text,TextPaint textPaint){
-		text = text.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");
+		text = text.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "").replace(" ","\t\t\t\t\t\t\t\t");
 		this.textPaint = textPaint;
 		convertToLines(text);
 		convertToPages();
@@ -94,6 +94,7 @@ public class PageSplit {
 			lineList.addAll(temp);
 		}
 	}
+
 	public List<String> SeperateByParagph(String datas) {
 
 		List<String> paragphdatas = new ArrayList<String>();
