@@ -107,7 +107,10 @@ public class ChapterListActivity extends ActivityBase {
 			}
 			ChapterInfo.saveInTx(list);
 			chapterInfoList.addAll(list);
-			runOnUiThread(()->{showLoading(false);});
+			runOnUiThread(()->{
+				listAdapter.addDataList(list);
+				showLoading(false);
+			});
 		});
 	}
 
