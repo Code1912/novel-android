@@ -1,6 +1,7 @@
 package com.code1912.novelapp.extend;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -31,22 +32,43 @@ public class ReadViewPager extends FrameLayout {
 	List<ReadView> viewList;
 	int position=0;
 	int lineSpacing=0;
+	int orientation;
 	public ReadViewPager(Context context) {
 		super(context);
 		this.setOnTouchListener((e,v)->onTextTouch(e,v));
-
+		this.getOrientation();
 	}
 
 	public ReadViewPager(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.setOnTouchListener((e,v)->onTextTouch(e,v));
+		this.getOrientation();
 	}
 
 	public ReadViewPager(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		this.setOnTouchListener((e,v)->onTextTouch(e,v));
+		this.getOrientation();
 	}
 
+	@Override
+	protected void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		getContentWidthHeight();
+		if(orientation!=newConfig.orientation) {
+			int temp = this.contentHeight;
+			this.contentHeight = this.contentWidth;
+			this.contentWidth = temp;
+		}
+		position=pageIndex;
+		pageIndex=0;
+		createPages(text);
+	}
+
+	private void   getOrientation(){
+	   this.orientation =  this.getResources().getConfiguration().orientation;
+	}
 	public  void setOnPageListener(PageAction onPageListener){
 		 this.onPageListener=onPageListener;
 	}
@@ -58,9 +80,8 @@ public class ReadViewPager extends FrameLayout {
 		this.onPageListener.onPage(direction,pageIndex);
 	}
 
-	public void setText(String text,FontSetting setting,int position) {
-		text = text.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");//.replace(" "," ");
-
+	public void setText(String textStr,FontSetting setting,int position) {
+		this.text = textStr.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");//.replace(" "," ");
 		this.position=position;
 		this.pageLineCount=0;
 		this. isClicked=false;
@@ -68,9 +89,8 @@ public class ReadViewPager extends FrameLayout {
 		this.viewList=null;
 
 		this.setting=setting;
-		this.text=text;
 		this.removeAllViews();
-		getContentWidthHeigth();
+		getContentWidthHeight();
 
 
 		textPaint.setTextSize(setting.fontSize);
@@ -90,6 +110,7 @@ public class ReadViewPager extends FrameLayout {
 		layoutParams.height = contentHeight;
 		layoutParams.width = contentWidth;
 		viewList = new ArrayList<>();
+		this.removeAllViews();
 		for (List<String> strings : pageList) {
 			ReadView view = new ReadView(getContext());
 			view.post(() -> {
@@ -113,10 +134,12 @@ public class ReadViewPager extends FrameLayout {
 		});
 	}
 
-	private  void getContentWidthHeigth(){
-		contentHeight=this.getHeight();
-		contentWidth=this.getWidth();
+	private  void getContentWidthHeight(){
+
+		contentHeight=this.getMeasuredHeight();
+		contentWidth=this.getMeasuredWidth();
 	}
+
 
 	private List<List<String>> convertToPages(List<String> lineList){
 		List<List<String>> pageLineList=new ArrayList<List<String>>();
