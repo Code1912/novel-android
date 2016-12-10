@@ -20,8 +20,6 @@ import com.code1912.novelapp.extend.ReadViewPager;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.Novel;
 import com.code1912.novelapp.utils.Config;
-import com.code1912.novelapp.utils.PageSplit;
-import com.code1912.novelapp.utils.PageSplitter;
 import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 import com.google.android.gms.appindexing.Action;
@@ -90,7 +88,7 @@ public class ChapterInfoActivity extends ActivityBase {
 
 	private  void txtPagerOnPage(ReadViewPager.ActionDirection direction, int pageIndex){
 		if(direction== ReadViewPager.ActionDirection.TO_CENTER){
-                        showToolBar(true);
+                        showToolBar(!isShowToolBar);
 		}
 		else  if(direction== ReadViewPager.ActionDirection.TO_PRE_CHAPTER){
                          toNext(-1);
@@ -101,6 +99,10 @@ public class ChapterInfoActivity extends ActivityBase {
 			showToolBar(false);
 		}
 		else {
+			if(pageIndex>0&&!isTempRead){
+				chapterInfo.position=pageIndex;
+				chapterInfo.save();
+			}
 			if(isShowToolBar){
 				showToolBar(false);
 			}
@@ -176,17 +178,35 @@ public class ChapterInfoActivity extends ActivityBase {
 			return;
 		}
 		if (i > 0 && index == (chapterList.size() - 1)) {
+			getMore();
 			return;
 		}
-		chapterInfo.position = 0;
-		if (!isTempRead) {
-			chapterInfo.save(chapterInfo);
-		}
+
 		chapterInfo = chapterList.get(index + i);
+		chapterInfo.position=0;
 		novel.last_chapter_index = chapterInfo.chapter_index;
 		getChapterInfo();
 	}
 
+	private  void getMore() {
+		NovelBiz.instance.getNewChapterList(novel.getId(), (list, success) -> {
+			if (!success) {
+				showMsg("没有更多了");
+				return;
+			}
+			if (list == null || list.size() == 0) {
+				showMsg("没有更多了");
+				return;
+			}
+			for (ChapterInfo chapterInfo : list) {
+				chapterInfo.novel_id = novel.getId();
+				chapterInfo.add_date = Util.getCurrentDate();
+			}
+			ChapterInfo.saveInTx(list);
+			chapterList.addAll(list);
+			toNext(1);
+		});
+	}
 	private boolean getNovel() {
 		novel = Transporter.instance.getTransportData(getIntent().getStringExtra(Config.NOVEL_INFO));
 		if (novel == null) {
@@ -195,6 +215,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		}
 		return true;
 	}
+
 
 	private void getChapterInfo() {
 		this.showLoading(true);
@@ -247,8 +268,8 @@ public class ChapterInfoActivity extends ActivityBase {
 	private void refreshUI() {
 		this.txtPager.post(() -> {
 			String content = Util.isNullOrEmpty(chapterInfo.content) ? "" : chapterInfo.content;
-			txtTitle.setText(Html.fromHtml(chapterInfo.title));
-			txtPager.setText(content, new ReadViewPager.FontSetting(55,20));
+			txtTitle.setText(chapterInfo.title);
+			txtPager.setText(content, new ReadViewPager.FontSetting(55,30),chapterInfo.position);
 		});
 	}
 
@@ -271,6 +292,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			chapterList = Transporter.instance.getTransportData(data.getStringExtra(Config.CHAPTER_LIST));
 			chapterInfo = Linq4j.asEnumerable(chapterList).first(n -> n.chapter_index == index);
 			novel.last_chapter_index = chapterInfo.chapter_index;
+			chapterInfo.position=0;
 			getChapterInfo();
 		}
 		super.onActivityResult(requestCode, resultCode, data);

@@ -51,8 +51,7 @@ public class ReadView extends View {
 		if(text==null||text.size()==0){
 			return;
 		}
-		Log.i("fffff---",String.valueOf( this.getHeight()));
-                y=50;
+		 y=50;
 		for (String s : text) {
 			canvas.drawText(s, 0, y, textPaint);
 			lineHeight = getLineHeight(s);

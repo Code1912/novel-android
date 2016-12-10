@@ -30,6 +30,7 @@ public class ReadViewPager extends FrameLayout {
 	PageAction onPageListener;
 	int pageIndex=0;
 	List<ReadView> viewList;
+	int position=0;
 	public ReadViewPager(Context context) {
 		super(context);
 		this.setOnTouchListener((e,v)->onTextTouch(e,v));
@@ -57,8 +58,9 @@ public class ReadViewPager extends FrameLayout {
 		this.onPageListener.onPage(direction,pageIndex);
 	}
 
-	public void setText(String text,FontSetting setting) {
+	public void setText(String text,FontSetting setting,int position) {
 		text = text.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");//.replace(" "," ");
+		this.position=position;
 		this.pageLineCount=0;
 		this. isClicked=false;
 		this.  pageIndex=0;
@@ -93,7 +95,13 @@ public class ReadViewPager extends FrameLayout {
 			viewList.add(view);
 		}
 		if (viewList.size() > 0) {
-			viewList.get(0).setVisibility(VISIBLE);
+			if(position>-1&&position<viewList.size())
+			{	viewList.get(position).setVisibility(VISIBLE);
+				pageIndex=position;
+			}
+			else {
+				viewList.get(0).setVisibility(VISIBLE);
+			}
 		}
 		Linq4j.asEnumerable(viewList).reverse().foreach(p -> {
 			this.addView(p);
@@ -102,9 +110,8 @@ public class ReadViewPager extends FrameLayout {
 	}
 
 	private  void getContentWidthHeigth(){
-		int he=this.getMeasuredHeight();
-		contentHeight=this.getMeasuredHeight();
-		contentWidth=this.getMeasuredWidth();
+		contentHeight=this.getHeight();
+		contentWidth=this.getWidth();
 	}
 
 	private List<List<String>> convertToPages(List<String> lineList){
@@ -243,7 +250,6 @@ public class ReadViewPager extends FrameLayout {
 		for (int i = 0; i < this.viewList.size(); i++) {
 			if(i==index){
 				this.viewList.get(i).setVisibility(VISIBLE);
-				Log.i("wwwwww---",String.valueOf( this.getHeight()));
 				//this.viewList.get(i).invalidate();
 			}
 			else{
