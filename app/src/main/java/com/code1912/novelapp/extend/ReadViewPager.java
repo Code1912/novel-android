@@ -3,7 +3,6 @@ package com.code1912.novelapp.extend;
 import android.content.Context;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 
 public class ReadViewPager extends FrameLayout {
-	TextPaint paint =new TextPaint();
+	TextPaint textPaint =new TextPaint();
 	int contentHeight;
 	int contentWidth;
 	String text;
@@ -31,6 +30,7 @@ public class ReadViewPager extends FrameLayout {
 	int pageIndex=0;
 	List<ReadView> viewList;
 	int position=0;
+	int lineSpacing=0;
 	public ReadViewPager(Context context) {
 		super(context);
 		this.setOnTouchListener((e,v)->onTextTouch(e,v));
@@ -60,6 +60,7 @@ public class ReadViewPager extends FrameLayout {
 
 	public void setText(String text,FontSetting setting,int position) {
 		text = text.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");//.replace(" "," ");
+
 		this.position=position;
 		this.pageLineCount=0;
 		this. isClicked=false;
@@ -70,12 +71,15 @@ public class ReadViewPager extends FrameLayout {
 		this.text=text;
 		this.removeAllViews();
 		getContentWidthHeigth();
-		this.lineHeight=(int)Math.ceil(  paint.getFontMetrics(null)  ) +setting.lineSpacing;
-		this.pageLineCount=this.contentHeight/lineHeight;
-		paint.setTextSize(setting.fontSize);
+
+
+		textPaint.setTextSize(setting.fontSize);
 		if (setting.color > 0) {
-			paint.setColor(setting.color);
+			textPaint.setColor(setting.color);
 		}
+		this.lineSpacing=setting.lineSpacing;
+		this.lineHeight=(int)Math.ceil(  textPaint.getFontMetrics(null)  ) +setting.lineSpacing;
+		this.pageLineCount=this.contentHeight/lineHeight;
 		createPages(text);
 	}
 
@@ -89,7 +93,7 @@ public class ReadViewPager extends FrameLayout {
 		for (List<String> strings : pageList) {
 			ReadView view = new ReadView(getContext());
 			view.post(() -> {
-				view.setText(strings, paint, lineHeight);
+				view.setText(strings, textPaint, lineHeight,lineSpacing);
 			});
 			view.setVisibility(INVISIBLE);
 			viewList.add(view);
@@ -181,7 +185,7 @@ public class ReadViewPager extends FrameLayout {
 			return  linesdata;
 		}
 		while (str.length() > 0) {
-			int nums = paint.breakText(str, true, with, null);
+			int nums = textPaint.breakText(str, true, with, null);
 			if (nums <= str.length()) {
 				String linnstr = str.substring(0, nums);
 				linesdata.add(linnstr);

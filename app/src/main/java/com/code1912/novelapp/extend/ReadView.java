@@ -26,12 +26,10 @@ import java.util.List;
  */
 
 public class ReadView extends View {
-
-
 	TextPaint textPaint=new TextPaint();
 	List<String> text= new ArrayList<>();
 	int lineHeight=0;
-	float y=0;
+	int lineSpacing=0;
 
 	public ReadView(Context context) {
 		super(context);
@@ -51,22 +49,16 @@ public class ReadView extends View {
 		if(text==null||text.size()==0){
 			return;
 		}
-		 y=50;
+		int pointY=0;
+		pointY-=(lineSpacing*2/3);
 		for (String s : text) {
-			canvas.drawText(s, 0, y, textPaint);
-			lineHeight = getLineHeight(s);
-			y += lineHeight;
+			pointY += lineHeight;
+			canvas.drawText(s, 0, pointY, textPaint);
 		}
 	}
-	public int getLineHeight(String word){
-		return  (int)Math.ceil(  textPaint.getFontMetrics(null)  )+20;
-	}
 
-
-
-
-	public    void setText(List<String> text, TextPaint textPaint,int lineHeight){
-		y=0;
+	public    void setText(List<String> text, TextPaint textPaint,int lineHeight,int lineSpacing){
+		this.lineSpacing=lineSpacing;
 		this.textPaint=textPaint;
 		this.text=text;
 		this.lineHeight=lineHeight;
