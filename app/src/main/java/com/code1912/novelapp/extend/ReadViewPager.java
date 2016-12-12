@@ -126,10 +126,9 @@ public class ReadViewPager extends FrameLayout {
 			viewList.add(view);
 		}
 		if (viewList.size() > 0) {
-			if (position > -1 && position < viewList.size()) {
-				pageIndex = position;
+			if (position > -1) {
+				pageIndex =position < viewList.size()? position:(viewList.size()-1);
 			}
-
 			View view = viewList.get(pageIndex);
 			view.post(() -> {
 				view.setVisibility(VISIBLE);

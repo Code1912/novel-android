@@ -79,7 +79,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			return;
 		}
 		getChapterList();
-		getChapterInfo();
+		getChapterInfo(false);
 
 		// ATTENTION: This was auto-generated to implement the App Indexing API.
 		// See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -192,7 +192,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		chapterInfo = chapterList.get(index + i);
 		chapterInfo.position=0;
 		novel.last_chapter_index = chapterInfo.chapter_index;
-		getChapterInfo();
+		getChapterInfo(i<0);
 	}
 
 	private  void getMore() {
@@ -227,7 +227,7 @@ public class ChapterInfoActivity extends ActivityBase {
 	}
 
 
-	private void getChapterInfo() {
+	private void getChapterInfo( boolean isToPrevious) {
 		this.showLoading(true);
 		if (novel.last_chapter_index < 1) {
 			chapterInfo = chapterList.get(0);
@@ -248,7 +248,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		if (!Util.isNullOrEmpty(chapterInfo.content)) {
 			isPagerClicked=false;
 			updateChapterInfo();
-			refreshUI();
+			refreshUI(isToPrevious);
 			this.showLoading(false);
 			return;
 		}
@@ -261,7 +261,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			}
 			chapterInfo.content = info.content;
 			updateChapterInfo();
-			refreshUI();
+			refreshUI(isToPrevious);
 		});
 	}
 
@@ -278,11 +278,11 @@ public class ChapterInfoActivity extends ActivityBase {
 		notifyReadCountChanged();
 	}
 
-	private void refreshUI() {
+	private void refreshUI(boolean isToPrevious) {
 		this.txtPager.post(() -> {
 			String content = Util.isNullOrEmpty(chapterInfo.content) ? "" : chapterInfo.content;
 			txtTitle.setText(chapterInfo.title);
-			txtPager.setText(content, new ReadViewPager.FontSetting(55,30),chapterInfo.position);
+			txtPager.setText(content, new ReadViewPager.FontSetting(55,30), isToPrevious?99999:chapterInfo.position);
 		});
 	}
 
@@ -306,7 +306,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			chapterInfo = Linq4j.asEnumerable(chapterList).first(n -> n.chapter_index == index);
 			novel.last_chapter_index = chapterInfo.chapter_index;
 			chapterInfo.position=0;
-			getChapterInfo();
+			getChapterInfo(false);
 		}
 		super.onActivityResult(requestCode, resultCode, data);
 	}
