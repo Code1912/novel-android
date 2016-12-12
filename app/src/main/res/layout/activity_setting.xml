@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 xmlns:tools="http://schemas.android.com/tools"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent" android:background="@drawable/ic_bg"
+                                                 android:fitsSystemWindows="true"  tools:context=".SettingActivity" >
+
+
+<FrameLayout
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"   >
+
+    <ImageView android:id="@+id/img_bg" android:scaleType="fitXY"
+
+               android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <RelativeLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"  android:background="@android:color/transparent" >
+
+        <TableLayout
+            android:background="#D1000000"
+            android:layout_width="match_parent"
+            android:layout_alignParentBottom="true" android:paddingLeft="@dimen/activity_horizontal_margin" android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_height="wrap_content"  android:stretchColumns="1"    android:shrinkColumns="0,2">
+            <TableRow  android:paddingBottom="10dp" android:paddingTop="10dp"  >
+                <ImageView   android:layout_width="15dp"
+                             android:layout_height="15dp"
+                             app:ico_icon="@string/faw_font"
+                             app:ico_size="15dp"
+                             app:ico_color="@color/colorWhite"/>
+                <SeekBar android:max="100" android:progress="50"
+                         android:progressDrawable="@drawable/seekbar_style"
+                    />
+                <ImageView   android:layout_width="20dp"
+                             android:layout_height="20dp"
+                             app:ico_icon="@string/faw_font"
+                             app:ico_size="20dp"
+                             app:ico_color="@color/colorWhite"/>
+            </TableRow>
+
+        </TableLayout>
+    </RelativeLayout>
+</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

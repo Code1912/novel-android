@@ -87,7 +87,8 @@ public class ReadViewPager extends FrameLayout {
 	}
 
 	public void setText(String textStr,FontSetting setting,int position) {
-		this.text = textStr.replaceAll("\\r", "\r").replaceAll("\\t", "\t").replaceAll("\n","\t\t\t\t\n\t\t\t\t");
+		this.text =  "\t\t"+textStr.replaceAll("\\r", "\r").replaceAll("\\t", "\t").replaceAll("\n","\t\t\n\t\t");
+		this.text=setFontSpacing(this.text,setting.fontSpacing);
 		this.position=position;
 		this.pageLineCount=0;
 		this. isClicked=false;
@@ -103,12 +104,28 @@ public class ReadViewPager extends FrameLayout {
 		if (setting.color > 0) {
 			textPaint.setColor(setting.color);
 		}
+
 		this.lineSpacing=setting.lineSpacing;
 		this.lineHeight=(int)Math.ceil(  textPaint.getFontMetrics(null)  ) +setting.lineSpacing;
 		this.pageLineCount=this.contentHeight/lineHeight;
 		createPages(text);
 	}
 
+	private  String setFontSpacing(String originalText,int fontSpacing){
+		if(fontSpacing==0){
+			return  originalText;
+		}
+		String spacing="";
+		for(int i = 0; i <fontSpacing; i++) {
+			spacing+=" ";
+		}
+		StringBuilder builder = new StringBuilder();
+		for(int i = 0; i < originalText.length(); i++) {
+			String c =   originalText.charAt(i)+spacing;
+			builder.append(c) ;
+		}
+		return  builder.toString();
+	}
 	private  void createPages(String text) {
 		List<String> lines=convertToLines(text);
 		List<List<String>> pageList=convertToPages(lines);
@@ -291,6 +308,7 @@ public class ReadViewPager extends FrameLayout {
 		public float fontSize;
 		public int lineSpacing;
 		public int color;
+		public int fontSpacing;
 
 		public FontSetting() {
 
@@ -302,6 +320,13 @@ public class ReadViewPager extends FrameLayout {
 			this.fontSize = fontSize;
 			this.lineSpacing = lineSpacing;
 		}
+		public FontSetting(int fontSize, int lineSpacing,int fontSpacing,int color) {
+			this.fontSize = fontSize;
+			this.lineSpacing = lineSpacing;
+			this.fontSpacing=fontSpacing;
+			this.color=color;
+		}
+
 		public FontSetting(int fontSize, int lineSpacing,int color) {
 			this.fontSize = fontSize;
 			this.lineSpacing = lineSpacing;

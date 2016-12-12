@@ -17,6 +17,7 @@ import java.util.Random;
  */
 
 public class Config {
+	public static final String CHAPTER_INFO_SCREENSHOT ="CHAPTER_INFO_SCREENSHOT" ;
 	public static String ApiHost = "http://www.code1912.cn:3000";
 	public static final String TRANSPORT_KEY = "TRANSPORT_KEY";
 	public static final String NOVEL_INFO = "NOVEL_INFO";
@@ -30,7 +31,7 @@ public class Config {
 	public static final String BROADCAST_ADD_NOVEL = "BROADCAST_ADD_NOVEL";
 	public static final String BROADCAST_NOTIFY_NOVEL = "BROADCAST_NOTIFY_NOVEL";
 	public static  final  int CHAPTER_LIST_ACTIVITY_RESULT=90;
-
+	public static  final  int SETTING_ACTIVITY_RESULT=91;
 
 	public static String getSearchUrl(String keyword, int pageIndex) {
 		return String.format("%s/search?keyword=%s&pageIndex=%d&type=1&r=%d",

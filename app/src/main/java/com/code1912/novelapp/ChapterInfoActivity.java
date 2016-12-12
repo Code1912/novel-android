@@ -1,8 +1,11 @@
 package com.code1912.novelapp;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -19,7 +22,9 @@ import com.code1912.novelapp.extend.ReadView;
 import com.code1912.novelapp.extend.ReadViewPager;
 import com.code1912.novelapp.model.ChapterInfo;
 import com.code1912.novelapp.model.Novel;
+import com.code1912.novelapp.model.Setting;
 import com.code1912.novelapp.utils.Config;
+import com.code1912.novelapp.utils.Screenshot;
 import com.code1912.novelapp.utils.Transporter;
 import com.code1912.novelapp.utils.Util;
 import com.google.android.gms.appindexing.Action;
@@ -29,6 +34,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.apache.calcite.linq4j.Linq4j;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
 /**
@@ -67,6 +74,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		findViewById(R.id.btn_menu).setOnClickListener(v -> this.btnMenuClick(v));
 		findViewById(R.id.btn_download).setOnClickListener(v -> this.btnDownloadClick(v));
+		findViewById(R.id.btn_setting).setOnClickListener(v -> this.btnSettingClick(v));
 		toolbar.setTitle("");
 		setSupportActionBar(toolbar);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -113,8 +121,38 @@ public class ChapterInfoActivity extends ActivityBase {
 			}
 			isPagerClicked=false;
 		}
+	}
+
+	private  void btnSettingClick(View v){
+		showToolBar(false);
+		Intent newIntent = new Intent(ChapterInfoActivity.this, SettingActivity.class);
+		newIntent.putExtra(Config.CHAPTER_INFO_SCREENSHOT,screenshot());
+		startActivityForResult(newIntent, Config.CHAPTER_LIST_ACTIVITY_RESULT);
+	}
 
 
+	private String screenshot()
+	{
+		String filePath="";
+		// 获取屏幕
+		View dView = getWindow().getDecorView();
+		dView.setDrawingCacheEnabled(true);
+		dView.buildDrawingCache();
+		Bitmap bmp = Screenshot.myShot(this);
+		if (bmp != null)
+		{
+			try {
+				  filePath = "screenshot.png";
+
+				FileOutputStream os = this.openFileOutput(filePath,MODE_PRIVATE);
+				bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+				os.flush();
+				os.close();
+			} catch (Exception e) {
+				filePath="";
+			}
+		}
+		return  filePath;
 	}
 	private void btnMenuClick(View v) {
 		Intent newIntent = new Intent(ChapterInfoActivity.this, ChapterListActivity.class);
@@ -282,7 +320,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		this.txtPager.post(() -> {
 			String content = Util.isNullOrEmpty(chapterInfo.content) ? "" : chapterInfo.content;
 			txtTitle.setText(chapterInfo.title);
-			txtPager.setText(content, new ReadViewPager.FontSetting(55,30), isToPrevious?99999:chapterInfo.position);
+			txtPager.setText(content, Setting.instance.getFontSetting(), isToPrevious?99999:chapterInfo.position);
 		});
 	}
 
