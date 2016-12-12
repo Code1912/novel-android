@@ -47,9 +47,9 @@ public class ChapterInfoActivity extends ActivityBase {
 	TableLayout footer;
 	boolean isShowToolBar;
 	List<ChapterInfo> chapterList;
-	int positionY;
 	boolean isTempRead = false;
 	boolean isDownloadingAll = false;
+	boolean isPagerClicked=true;
 	/**
 	 * ATTENTION: This was auto-generated to implement the App Indexing API.
 	 * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -87,8 +87,13 @@ public class ChapterInfoActivity extends ActivityBase {
 	}
 
 	private  void txtPagerOnPage(ReadViewPager.ActionDirection direction, int pageIndex){
+		if(isPagerClicked){
+			return;
+		}
+		isPagerClicked=true;
 		if(direction== ReadViewPager.ActionDirection.TO_CENTER){
                         showToolBar(!isShowToolBar);
+			isPagerClicked=false;
 		}
 		else  if(direction== ReadViewPager.ActionDirection.TO_PRE_CHAPTER){
                          toNext(-1);
@@ -106,6 +111,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			if(isShowToolBar){
 				showToolBar(false);
 			}
+			isPagerClicked=false;
 		}
 
 
@@ -175,6 +181,7 @@ public class ChapterInfoActivity extends ActivityBase {
 		int index = chapterList.indexOf(chapterInfo);
 		if (i < 0 && index == 0) {
 			Util.toast(this, "没有更多啦");
+			isPagerClicked=false;
 			return;
 		}
 		if (i > 0 && index == (chapterList.size() - 1)) {
@@ -191,10 +198,12 @@ public class ChapterInfoActivity extends ActivityBase {
 	private  void getMore() {
 		NovelBiz.instance.getNewChapterList(novel.getId(), (list, success) -> {
 			if (!success) {
+				isPagerClicked=false;
 				showMsg("没有更多了");
 				return;
 			}
 			if (list == null || list.size() == 0) {
+				isPagerClicked=false;
 				showMsg("没有更多了");
 				return;
 			}
@@ -204,6 +213,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			}
 			ChapterInfo.saveInTx(list);
 			chapterList.addAll(list);
+			novel.is_have_new=false;
 			toNext(1);
 		});
 	}
@@ -227,6 +237,7 @@ public class ChapterInfoActivity extends ActivityBase {
 			});
 		}
 		if (chapterInfo == null) {
+			isPagerClicked=false;
 			Util.toast(ChapterInfoActivity.this, "获取章节信息失败");
 			this.showLoading(false);
 			return;
@@ -235,12 +246,14 @@ public class ChapterInfoActivity extends ActivityBase {
 			chapterInfo.content = NovelBiz.instance.getContentById(chapterInfo.getId());
 		}
 		if (!Util.isNullOrEmpty(chapterInfo.content)) {
+			isPagerClicked=false;
 			updateChapterInfo();
 			refreshUI();
 			this.showLoading(false);
 			return;
 		}
 		NovelBiz.instance.getChapterInfo(chapterInfo.url, (info, isSuccess) -> {
+			isPagerClicked=false;
 			this.showLoading(false);
 			if (!isSuccess) {
 				showMsg("获取信息失败");

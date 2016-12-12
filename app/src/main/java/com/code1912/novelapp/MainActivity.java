@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         gridView = (GridView) findViewById(R.id.novel_grid);
         novelListAdapter = new ListAdapter(this, MainGridItemViewHolder.class, R.layout.activity_main_item);
         gridView.setAdapter(novelListAdapter);
-        novelListAdapter.addDataList(Novel.listAll(Novel.class));
+        novelListAdapter.addDataList(Novel.listAll(Novel.class," id desc "));
         novelListAdapter.setOnItemChildClick((v, data, id) -> {
             if (id == R.id.icon_trash) {
                 int index = novelListAdapter.getList().indexOf(data);
@@ -170,26 +170,15 @@ public class MainActivity extends AppCompatActivity {
     private void refresh(Novel novel) {
         NovelBiz.instance.getChapterList(novel.current_url, (list, isSuccess) -> {
             if (!isSuccess) {
-                novel.save();
                 novel.refreshed = true;
                 refreshUI();
                 return;
             }
-            novel.is_have_new = list.size() > novel.all_chapter_count;
-            if (novel.is_have_new) {
-                for (ChapterInfo chapterInfo : list) {
-                    List<ChapterInfo> titles = ChapterInfo.find(ChapterInfo.class, String.format(" novelid=%d and chapterindex=%d and type=%d",novel.getId(),chapterInfo.chapter_index,novel.type));
-                    if (titles != null || titles.size() > 0) {
-                        continue;
-                    }
-                    chapterInfo.novel_id = novel.getId();
-                    chapterInfo.add_date = Util.getCurrentDate();
-                    ChapterInfo.save(chapterInfo);
-                }
+            if(list.size() > novel.all_chapter_count){
+                novel.is_have_new=true;
+                novel.all_chapter_count = list.size();
+                novel.save();
             }
-            novel.refreshed = true;
-            novel.all_chapter_count = list.size();
-            novel.save();
             novel.refreshed = true;
             refreshUI();
         });

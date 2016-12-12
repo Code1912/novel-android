@@ -90,7 +90,6 @@ public class ChapterListActivity extends ActivityBase {
 	}
 
 	private  void btnRefreshClick(View v) {
-
 		this.showLoading(true);
 		NovelBiz.instance.getNewChapterList(novel.getId(), (list, success) -> {
 			if (!success) {
@@ -107,7 +106,9 @@ public class ChapterListActivity extends ActivityBase {
 			}
 			ChapterInfo.saveInTx(list);
 			chapterInfoList.addAll(list);
-			runOnUiThread(()->{
+			novel.is_have_new=false;
+			novel.save();
+			listView.post(()->{
 				listAdapter.addDataList(list);
 				showLoading(false);
 			});
