@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,16 +55,21 @@ public class ReadViewPager extends FrameLayout {
 	@Override
 	protected void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
+		Log.i("Direction Change:", "1111111111111111111");
+		this.post(() -> {
+			if ((newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && this.contentHeight > this.contentWidth)
+				|| (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && this.contentHeight < this.contentWidth)) {
+				int temp = this.contentHeight;
+				this.contentHeight = this.contentWidth;
+				this.contentWidth = temp;
+			}
+			Log.i("pager height:  ",String.valueOf(contentHeight));
+			Log.i("pager width: ",String.valueOf(contentWidth));
 
-		getContentWidthHeight();
-		if(orientation!=newConfig.orientation) {
-			int temp = this.contentHeight;
-			this.contentHeight = this.contentWidth;
-			this.contentWidth = temp;
-		}
-		position=pageIndex;
-		pageIndex=0;
-		createPages(text);
+			position = pageIndex;
+			pageIndex = 0;
+			createPages(text);
+		});
 	}
 
 	private void   getOrientation(){
@@ -81,7 +87,7 @@ public class ReadViewPager extends FrameLayout {
 	}
 
 	public void setText(String textStr,FontSetting setting,int position) {
-		this.text = textStr.replace("\\r", "\r").replace("\\t", "\t").replace("\r", "");//.replace(" "," ");
+		this.text = textStr.replaceAll("\\r", "\r").replaceAll("\\t", "\t").replaceAll("\n","\t\t\t\t\n\t\t\t\t");
 		this.position=position;
 		this.pageLineCount=0;
 		this. isClicked=false;
@@ -106,9 +112,9 @@ public class ReadViewPager extends FrameLayout {
 	private  void createPages(String text) {
 		List<String> lines=convertToLines(text);
 		List<List<String>> pageList=convertToPages(lines);
-		ViewGroup.LayoutParams layoutParams = getLayoutParams();
-		layoutParams.height = contentHeight;
-		layoutParams.width = contentWidth;
+		//ViewGroup.LayoutParams layoutParams = getLayoutParams();
+		//layoutParams.height = contentHeight;
+		//layoutParams.width = contentWidth;
 		viewList = new ArrayList<>();
 		this.removeAllViews();
 		for (List<String> strings : pageList) {
@@ -116,26 +122,26 @@ public class ReadViewPager extends FrameLayout {
 			view.post(() -> {
 				view.setText(strings, textPaint, lineHeight,lineSpacing);
 			});
-			view.setVisibility(INVISIBLE);
+			view.setVisibility(GONE);
 			viewList.add(view);
 		}
 		if (viewList.size() > 0) {
-			if(position>-1&&position<viewList.size())
-			{	viewList.get(position).setVisibility(VISIBLE);
-				pageIndex=position;
+			if (position > -1 && position < viewList.size()) {
+				pageIndex = position;
 			}
-			else {
-				viewList.get(0).setVisibility(VISIBLE);
-			}
+
+			View view = viewList.get(pageIndex);
+			view.post(() -> {
+				view.setVisibility(VISIBLE);
+			});
 		}
-		Linq4j.asEnumerable(viewList).reverse().foreach(p -> {
+		Linq4j.asEnumerable(viewList).foreach(p -> {
 			this.addView(p);
 			return p;
 		});
 	}
 
 	private  void getContentWidthHeight(){
-
 		contentHeight=this.getMeasuredHeight();
 		contentWidth=this.getMeasuredWidth();
 	}
@@ -208,11 +214,11 @@ public class ReadViewPager extends FrameLayout {
 			return  linesdata;
 		}
 		while (str.length() > 0) {
-			int nums = textPaint.breakText(str, true, with, null);
-			if (nums <= str.length()) {
-				String linnstr = str.substring(0, nums);
-				linesdata.add(linnstr);
-				str = str.substring(nums, str.length());
+			int count = textPaint.breakText(str, true, with, null);
+			if (count <= str.length()) {
+				String lineStr = str.substring(0, count);
+				linesdata.add(lineStr);
+				str = str.substring(count, str.length());
 			} else {
 				linesdata.add(str);
 				str = "";
@@ -269,22 +275,18 @@ public class ReadViewPager extends FrameLayout {
 			setViewShow(pageIndex);
 			executeOnPage(ActionDirection.TO_Down,pageIndex);
 		}
-
-		//txtContent.scrollTo(0,moveY);
 	}
-	private  void setViewShow(int index){
+
+	private  void setViewShow(int index) {
 
 		for (int i = 0; i < this.viewList.size(); i++) {
-			if(i==index){
-				this.viewList.get(i).setVisibility(VISIBLE);
-				//this.viewList.get(i).invalidate();
-			}
-			else{
-				this.viewList.get(i).setVisibility(INVISIBLE);
-			}
+			View view = viewList.get(i);
+			final int tempI = i;
+			view.post(() -> {
+				view.setVisibility(tempI == index ? VISIBLE : GONE);
+			});
 		}
 	}
-
 
 	public static   class  FontSetting {
 		public float fontSize;
